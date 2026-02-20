@@ -1,5 +1,5 @@
 {
-  description = "WiPro thesis dev shell (tectonic + biber-for-tectonic + make)";
+  description = "BAA thesis dev shell (tectonic + biber-for-tectonic + make + auto-build)";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
 
@@ -13,26 +13,27 @@
         pkgs = import nixpkgs { inherit system; };
       in {
         default = pkgs.mkShell {
-          # Tools available when you `nix develop`
           packages = [
             pkgs.gnumake
             pkgs.git
             pkgs.tectonic
-            pkgs.biber-for-tectonic   # <-- per your request (2.17 on 24.11)
+            pkgs.biber-for-tectonic
+            pkgs.entr
           ];
 
-          # Keep cache tidy; not strictly required
           env = {
             TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
           };
 
           shellHook = ''
-            echo "Dev shell: Tectonic + biber-for-tectonic"
-            echo "which biber: $(which biber)"
-            biber --version | head -n1 || true
-            echo "which tectonic: $(which tectonic)"
-            tectonic --version || true
-            echo "Tip: run 'which -a biber' to ensure no other biber shadows this one."
+            echo "Dev shell: Tectonic + Auto-build enabled"
+            
+            # Alias to make it easy to start the watcher
+            alias watch-build="find . -name '*.tex' -o -name 'Makefile' | entr make" [cite: 6]
+            
+            echo "-------------------------------------------------------"
+            echo "To build automatically on save, run: watch-build"
+            echo "-------------------------------------------------------"
           '';
         };
       });
