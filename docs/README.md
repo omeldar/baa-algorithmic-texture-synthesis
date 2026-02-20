@@ -1,26 +1,52 @@
-# WIPRO @ HSLU
+# Documentation
 
-> by Eldar Omerovic
+This directory contains the complete thesis documentation. It includes the full LaTeX source code, configuration files, chapter files, bibliography, and supporting material required to build the final thesis document.
 
----
+## Purpose
 
-## Getting Started on NixOS
+The `/docs` folder serves as the authoritative source for the written thesis, including:
 
-First, clone this repository.
+- Research problem and motivation
+- Theoretical foundations
+- Methodology and implementation details
+- Experimental evaluation
+- Results and discussion
+- References and appendices
 
-If you're using NixOS, just run `nix develop` within this project's root directory. After that, you can run `make` to build the documentation.
+All modifications to the written thesis should be made within this directory.
 
-In the `build` folder you'll see a `main.pdf`. This is the built documentation which you can open with a `.pdf` viewer of your choice.
+## Structure
 
-## More Information
+Typical contents include:
 
-If you're interested in building this yourself, here's some information on how its set up on nix.
+- `main.tex` – Root LaTeX file
+- `preamble.tex` – Global package configuration
+- `macros.tex` – Custom LaTeX commands
+- `acronyms.tex` – Centralized acronym definitions
+- `lststyles.tex` – Code listing configurations
+- Chapter files (e.g., `01_*.tex`)
+- `hypersetup.tex` – Hyperref configuration
+- Bibliography files (`.bib`)
+- `Makefile` – Build automation
 
-This project is being built with:
+## Building the Thesis
 
-- `tectonic` (TeX engine)
-- `biber`\* (v2.17 for biblatex v3.17)
-- `gnumake`
-- `git`
+Use:
 
-\* biber is installed (on nixos) using the package `biber-for-tectonic` because its shipped with the compatible version for tectonic. See compatibility table, to find the version you might need: [Texdoc (on page 5)](https://texdoc.org/serve/biber.pdf/0)
+```
+make
+```
+
+Ensure the required LaTeX toolchain is installed, including:
+
+- `pdflatex`
+- `biber`
+- `makeglossaries`
+
+## Notes
+
+- Acronyms are defined in `acronyms.tex` and require `makeglossaries`.
+- Bibliography processing uses `biber`.
+- The compiled PDF is generated in this directory or in a designated build folder.
+
+This directory is intended to remain self-contained and reproducible.
