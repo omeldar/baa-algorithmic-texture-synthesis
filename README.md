@@ -43,10 +43,10 @@ This project explores hybrid approaches combining procedural methods with rule-b
 
 ## Repository Structure
 
-- `docs/` – Thesis document and presentation material
-- `src/` – Core implementation
-- `experiments/` – Evaluation and parameter studies
 - `assets/` – Reference and generated textures
+- `docs/` – Thesis document and presentation material
+- `experiments/` – Evaluation and parameter studies
+- `src/` – Core implementation
 - `tests/` – Unit and validation tests
 
 ## Technologies
