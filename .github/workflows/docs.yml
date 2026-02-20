@@ -1,4 +1,4 @@
-name: Build and Deploy Documentation
+name: Build & Deploy Documentation
 
 on:
   push:
@@ -6,11 +6,9 @@ on:
       - main
     paths:
       - "docs/**"
-      - ".github/workflows/docs.yml"
   pull_request:
     paths:
       - "docs/**"
-      - ".github/workflows/docs.yml"
 
 permissions:
   contents: read
@@ -21,24 +19,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    container:
-      image: ghcr.io/tectonic-typesetter/tectonic:latest
-
-    defaults:
-      run:
-        working-directory: docs
-
     steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build documentation using Makefile
-        run: make
-
-      - name: Prepare GitHub Pages content
+      - name: Build docs via Nix
+        working-directory: docs
         run: |
-          mkdir -p ../public
-          cp *.pdf ../public/
+          nix develop --command make
+
+      - name: Prepare Pages
+        run: |
+          mkdir -p public
+          cp docs/*.pdf public/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -49,11 +47,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v4
