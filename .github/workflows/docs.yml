@@ -28,19 +28,17 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v27
         with:
-          # Using unstable for the latest Tectonic/Biber versions
+          # We use nixos-unstable to get the latest tectonic and biber-for-tectonic
           nix_path: nixpkgs=channel:nixos-unstable
-          extra_nix_config: |
-            experimental-features = nix-command flakes
 
-      - name: Build PDF via Custom Flake
-        run: nix build .#default?flake=docs/flake.ci.nix
+      - name: Build PDF via CI Nix file
+        # nix-build looks for the file we just created
+        run: nix-build docs/ci.nix -o result
 
       - name: Prepare Pages
         run: |
           mkdir -p public
-          # Nix outputs the result to a symlink named 'result'
-          # Copy your main.pdf  to the public folder
+          # Copy the generated PDF from the Nix result 
           cp result/main.pdf public/index.pdf
 
       - name: Upload Pages artifact
