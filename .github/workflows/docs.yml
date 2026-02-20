@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: texlive/texlive:latest
+      image: ghcr.io/tectonic-typesetter/tectonic:latest
 
     defaults:
       run:
