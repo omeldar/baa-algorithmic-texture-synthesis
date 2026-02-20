@@ -1,0 +1,38 @@
+name: Build Documentation (LaTeX via Makefile)
+
+on:
+  push:
+    paths:
+      - "docs/**"
+  pull_request:
+    paths:
+      - "docs/**"
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: docs
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install TeX Live (full toolchain)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-full \
+            latexmk \
+            make
+
+      - name: Build documentation
+        run: make
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-pdf
+          path: docs/*.pdf
