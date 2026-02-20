@@ -1,0 +1,23 @@
+\raggedright
+\section{List of Sources}
+
+\printbibliography[heading=none]
+
+\clearpage
+\section{List of Figures}
+\onlylof
+
+
+\section{List of Tables}
+\onlylot
+
+
+\section{List of Code-Blocks}
+\onlylol
+
+\section{List of Acronyms}
+\begingroup
+% This tells the glossary to print absolutely no title and not trigger a chapter break
+\renewcommand{\glossarysection}[2][]{}
+\printglossary[type=\acronymtype]
+\endgroup
