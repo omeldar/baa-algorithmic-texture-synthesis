@@ -6,9 +6,11 @@ on:
       - main
     paths:
       - "docs/**"
+      - ".github/workflows/docs.yml"
   pull_request:
     paths:
       - "docs/**"
+      - ".github/workflows/docs.yml"
 
 permissions:
   contents: read
@@ -20,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/xu-cheng/latex:latest
+      image: texlive/texlive:latest
 
     defaults:
       run:
@@ -33,7 +35,7 @@ jobs:
       - name: Build documentation using Makefile
         run: make
 
-      - name: Prepare Pages content
+      - name: Prepare GitHub Pages content
         run: |
           mkdir -p ../public
           cp *.pdf ../public/
