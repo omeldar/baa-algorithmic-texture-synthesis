@@ -42,10 +42,10 @@ jobs:
       - name: Prepare Pages content
         run: |
           mkdir -p public
-          cp docs/*.pdf public/
+          cp docs/build/*.pdf public/
 
-          # simple index page
-          echo "<meta http-equiv='refresh' content='0; url=$(basename docs/*.pdf)'>" > public/index.html
+          PDF_NAME=$(basename docs/build/*.pdf)
+          echo "<meta http-equiv='refresh' content='0; url=${PDF_NAME}'>" > public/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
