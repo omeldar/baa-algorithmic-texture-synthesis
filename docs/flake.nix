@@ -8,33 +8,46 @@
     systems = [ "x86_64-linux" "aarch64-linux" ];
     forAll = f: builtins.listToAttrs (map (s: { name = s; value = f s; }) systems);
   in {
+
+    # Development shell
     devShells = forAll (system:
       let
         pkgs = import nixpkgs { inherit system; };
       in {
         default = pkgs.mkShell {
-          packages = [
-            pkgs.gnumake
-            pkgs.git
-            pkgs.tectonic
-            pkgs.biber-for-tectonic
-            pkgs.entr
+          packages = with pkgs; [
+            gnumake
+            git
+            tectonic
+            biber-for-tectonic
+            entr
           ];
 
-          env = {
-            TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
-          };
+          TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
 
           shellHook = ''
-            echo "Dev shell: Tectonic + Auto-build enabled"
-            
-            # Alias to make it easy to start the watcher
-            alias watch-build="find . -name '*.tex' -o -name 'Makefile' | entr make" [cite: 6]
-            
+            echo "Dev shell: Thesis documentation environment"
+
+            alias watch-build="find . -name '*.tex' -o -name 'Makefile' | entr -c make"
+
             echo "-------------------------------------------------------"
-            echo "To build automatically on save, run: watch-build"
+            echo "Manual build: make"
+            echo "Auto build:   watch-build"
             echo "-------------------------------------------------------"
           '';
+        };
+      });
+
+    # Clean build entrypoint for CI and local usage
+    apps = forAll (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in {
+        build-docs = {
+          type = "app";
+          program = toString (pkgs.writeShellScript "build-docs" ''
+            make
+          '');
         };
       });
   };
