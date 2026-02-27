@@ -17,12 +17,7 @@
             gnumake
             git
             tectonic
-            biber-for-tectonic
             entr
-
-            texlivePackages.tex-gyre
-            texlivePackages.collection-fontsrecommended
-            fontconfig
           ];
 
           TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";

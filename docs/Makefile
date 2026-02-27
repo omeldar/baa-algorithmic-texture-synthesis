@@ -1,27 +1,28 @@
-MAIN=main
-OUTDIR=build
+MAIN = main
+OUTDIR = build
 
 .PHONY: all pdf clean
 
 all: pdf
 
-$(OUTDIR):
+pdf:
 	mkdir -p $(OUTDIR)
 
-pdf: $(OUTDIR)
-	# 1. First pass to generate .acn and .bcf files
-	tectonic -X compile $(MAIN).tex \
-	  --outdir $(OUTDIR) --keep-intermediates --reruns 0
-	  
-	# 2. Process bibliography
-	biber --input-directory $(OUTDIR) --output-directory $(OUTDIR) $(MAIN)
-	
-	# 3. Process acronyms
-	makeindex -s $(OUTDIR)/$(MAIN).ist -t $(OUTDIR)/$(MAIN).alg -o $(OUTDIR)/$(MAIN).acr $(OUTDIR)/$(MAIN).acn
-	
-	# 4. Final pass (with search-path so Tectonic finds the .acr and .bbl files)
-	tectonic -X compile $(MAIN).tex \
-	  --outdir $(OUTDIR) -Z search-path=$(OUTDIR)
+	# First pass
+	tectonic --outdir $(OUTDIR) --keep-logs --keep-intermediates $(MAIN).tex
+
+	# Glossaries (acronyms)
+	makeindex \
+	  -s $(OUTDIR)/$(MAIN).ist \
+	  -t $(OUTDIR)/$(MAIN).alg \
+	  -o $(OUTDIR)/$(MAIN).acr \
+	  $(OUTDIR)/$(MAIN).acn
+
+	# Final pass
+	tectonic --outdir $(OUTDIR) \
+	  --keep-logs --keep-intermediates \
+	  -Z search-path=$(OUTDIR) \
+	  $(MAIN).tex
 
 clean:
 	rm -rf $(OUTDIR)
