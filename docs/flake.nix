@@ -46,6 +46,7 @@
         build-docs = {
           type = "app";
           program = toString (pkgs.writeShellScript "build-docs" ''
+            cd ${self}
             make
           '');
         };
