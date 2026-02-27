@@ -2,14 +2,15 @@ name: Build & Deploy Documentation
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "docs/**"
+      - "docs/flake.nix"
       - ".github/workflows/docs.yml"
   pull_request:
     paths:
       - "docs/**"
+      - "docs/flake.nix"
       - ".github/workflows/docs.yml"
 
 permissions:
@@ -17,29 +18,34 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v27
-        with:
-          # We use nixos-unstable to get the latest tectonic and biber-for-tectonic
-          nix_path: nixpkgs=channel:nixos-unstable
+        uses: DeterminateSystems/nix-installer-action@v12
 
-      - name: Build PDF via CI Nix file
-        # nix-build looks for the file we just created
-        run: nix-build docs/ci.nix -o result
+      - name: Enable Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@v7
 
-      - name: Prepare Pages
+      - name: Build PDF
+        run: nix develop ./docs --command bash -lc "cd docs && make"
+
+      - name: Prepare Pages content
         run: |
           mkdir -p public
-          # Copy the generated PDF from the Nix result 
-          cp result/main.pdf public/index.pdf
+          cp docs/build/*.pdf public/
+
+          PDF_NAME=$(basename docs/build/*.pdf)
+          echo "<meta http-equiv='refresh' content='0; url=${PDF_NAME}'>" > public/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -53,7 +59,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Deploy to Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

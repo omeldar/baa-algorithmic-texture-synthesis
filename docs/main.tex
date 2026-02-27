@@ -10,16 +10,20 @@
 ]{scrreprt}
 
 % Fonts & language: Tectonic uses (Xe)TeX engine; use fontspec + polyglossia
-\usepackage{fontspec}
-\usepackage{polyglossia}
-\setmainlanguage[variant=british]{english}
-\setotherlanguage{german}
+% Encoding (safe default)
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 
-% Choose readable fonts
-\setmainfont{TeX Gyre Pagella}
-\setsansfont{TeX Gyre Heros}
-\setmonofont{TeX Gyre Cursor}
+% Languages (replacement for polyglossia)
+\usepackage[british,ngerman]{babel}
 
+% TeX Gyre fonts (same fonts as before)
+\usepackage{tgpagella}   % serif (main)
+\usepackage{tgheros}     % sans-serif
+\usepackage{tgcursor}    % monospace
+
+% Make sans-serif the default sans font (optional but matches fontspec behaviour)
+\renewcommand{\familydefault}{\rmdefault}
 % Encoding & micro-typography
 \usepackage{microtype}
 

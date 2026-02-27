@@ -13,27 +13,24 @@
         pkgs = import nixpkgs { inherit system; };
       in {
         default = pkgs.mkShell {
-          packages = [
-            pkgs.gnumake
-            pkgs.git
-            pkgs.tectonic
-            pkgs.biber-for-tectonic
-            pkgs.entr
+          packages = with pkgs; [
+            gnumake
+            git
+            tectonic
+            entr
+
+            texlive.combined.scheme-small
           ];
 
-          env = {
-            TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
-          };
+          TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
 
           shellHook = ''
-            echo "Dev shell: Tectonic + Auto-build enabled"
-            
-            # Alias to make it easy to start the watcher
-            alias watch-build="find . -name '*.tex' -o -name 'Makefile' | entr make" [cite: 6]
-            
-            echo "-------------------------------------------------------"
-            echo "To build automatically on save, run: watch-build"
-            echo "-------------------------------------------------------"
+            echo "Dev shell: Thesis documentation environment"
+
+            alias watch-build="find . -name '*.tex' -o -name 'Makefile' | entr -c make"
+
+            echo "Manual build: make"
+            echo "Auto build:   watch-build"
           '';
         };
       });
