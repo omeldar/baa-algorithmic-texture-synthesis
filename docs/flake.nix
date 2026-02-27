@@ -18,6 +18,8 @@
             git
             tectonic
             entr
+
+            texlive.combined.scheme-small
           ];
 
           TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
