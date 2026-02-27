@@ -19,6 +19,9 @@
             tectonic
             biber-for-tectonic
             entr
+
+            texlivePackages.tex-gyre
+            texlivePackages.collection-fontsrecommended
           ];
 
           TECTONIC_CACHE_DIR = "$HOME/.cache/Tectonic";
