@@ -64,9 +64,9 @@ else:
 
 ### Visual Example: L-System (Tree)
 
-The rule looks like this:
-
 ![Visual Rules-Based Example: L-Systen (Tree)](/assets/experiments/initial_exploration/tree.png)
+
+The rule looks like this:
 
 ```
 F → F[+F]F[-F]F
