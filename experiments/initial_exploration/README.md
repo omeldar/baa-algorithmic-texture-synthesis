@@ -29,7 +29,7 @@ This would generate a grayscale texture. Here:
 
 ![Visual Procedural Example: Stripes](/assets/experiments/initial_exploration/stripes.png)
 
-```
+```py
 if sin(x * 0.2) > 0:
     color = white
 else:
@@ -53,7 +53,7 @@ Rule:
 
 ![Simple Rule-Based Example](/assets/experiments/initial_exploration/simple_rulebased.png)
 
-```
+```py
 if x % 2 == 0:
     color = black
 elif y % 3 == 0:
@@ -68,7 +68,7 @@ else:
 
 The rule looks like this:
 
-```
+```py
 F → F[+F]F[-F]F
 ```
 
