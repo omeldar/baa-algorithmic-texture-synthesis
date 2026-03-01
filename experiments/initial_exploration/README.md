@@ -51,7 +51,7 @@ Rule:
 - Every second tile is black
 - Every third row is red
 
-![Simple Rules-Based Example](/assets/experiments/initial_exploration/simple_rulebased.png)
+![Simple Rule-Based Example](/assets/experiments/initial_exploration/simple_rulebased.png)
 
 ```
 if x % 2 == 0:
