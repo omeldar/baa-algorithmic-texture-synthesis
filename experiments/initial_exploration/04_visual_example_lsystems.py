@@ -52,6 +52,7 @@ def plot_segments(starts: np.ndarray, ends: np.ndarray, linewidth: float = 1.0):
         ax.plot([x0, x1], [y0, y1], color="black", linewidth=linewidth)
 
     ax.set_aspect("equal", adjustable="box")
+    plt.title("Tree-like L-System")
     ax.axis("off")
     plt.tight_layout()
     plt.show()
