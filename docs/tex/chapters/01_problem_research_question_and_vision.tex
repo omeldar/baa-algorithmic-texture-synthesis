@@ -1,11 +1,40 @@
 \section{Problem}
 
-\gls{api} is super!
+In computer graphics, the realistic rendering of surfaces plays a crucial role in the visual quality of generated images. One widely used technique for this purpose is texture mapping, where image textures are applied to geometric surfaces to simulate visual detail such as wood, stone, or fabric. Traditionally, these textures are obtained from pre-existing images that are mapped onto surfaces.
+
+While this approach is widely adopted, it has several limitations. For example, fixed image textures often lack flexibility, scalability, and parameterization, which makes them less suitable for dynamic or procedurally generated environments.
+
+An alternative approach is algorithmic texture synthesis, where textures are generated automatically using computational methods. Instead of relying on pre-recorded images, texture are produced through algorithms that define structural properties, patterns, and variations. Procedural methods generate textures based on mathematical functions or algorithms, while rule-based methods describe textures through sets of rules that define how patterns should emerge. In addition, optimization-based techniques can be used to estimate parameters that allow generated textures to approximate a given target texture.
+
+A key challenge in this domain is the approximation of a target texture using algorithmic techniques. Since algorithmically generated textures differ structurally from concrete image samples, an exact reproduction of a given texture is typically not possible. Instead, the task can be formulated as an optimization problem, where model parameters are adjusted so that the generated texture resembles the target texture as closely as possible according to a defined similarity metric.
+
+The problem addressed in this thesis is therefore the investigation of algorithmic texture synthesis approaches and their capability to approximate target textures using procedural, rules-based, and optimization-based methods. In particular, it is important to understand how such methods can be implemented, parametrized, and evaluated in the context of computer graphics applications.
 
 \section{Research Questions}
 
-knuth: \cite{knuth1984literate}
+Based on the problem described above, this thesis aims to investigate several research questions related to the generation and approximation of textures through algorithmic methods.
+
+The main research question can be formulated as follows:
+
+\textit{To what extent can algorithmic texture synthesis methods be used to approximate target textures in computer graphics?}
+
+To address this main question, several sub-questions can be defined:
+
+\begin{enumerate}
+    \item What existing approaches and systems for algorithmic texture synthesis are described in the current state of research?
+    \item How can procedural and rule-based methods be implemented in order to generate parameterizable texture models?
+    \item How can suitable parameters be estimated so that generated textures approximate a given target texture?
+    \item How do different texture synthesis approaches compare with respect to visual quality, flexibility, reproducibility, and controllability of parameters?
+\end{enumerate}
+
+These research questions guide the investigation of algorithmic techniques and provide a structured framework for analyzing and evaluating the developed methods.
 
 \section{Vision}
 
-cormen: \cite{cormen2009algorithms}
+The long-term vision of this work is to contribute to a better udnerstanding of algorithmic texture generation methods and their practical applicability in computer graphics. By exploring procedural, rule-based, and optimization-based approaches, this thesis aims to demonstrate how textures can be generated in a flexible and parameter-driven manner rather than relying solely on static image resources.
+
+Such approaches have the potential to enable more scalable and adaptable workflows in areas such as real time graphics, game development, simulation environments, and procedural world generation. Algorithmic methods allow textures to be generated dynamically, modified through parameters, and adapted to different contexts without the need for large texture libraries.
+
+In this context, the thesis envisions a prototype system that demonstrates how parameterizable texture models can be implemented and evaluated. The results of this work may provide insights into the advantages and limitations of different algorithmic texture synthesis approaches and highlight their suitability for typical computer graphics applications.
+
+Ultimately, the findings may serve as a basis for further research and development in procedural content generation, where algorithmic methods are increasingly used to create complex and visually rich digital environments.
