@@ -1,1 +1,141 @@
-TBD
+\section{Texture Representation in Computer Graphics}
+
+In computer graphics, textures are used to represent surface details of objects without increasing geometric complexity. Instead of modeling every small feature with additional polygons, textures store visual information that can be applied to surfaces during rendering \cite{watt1993computergraphics}. This approach allows objects to appear visually complex while keeping the underlying geometry relatively simple.
+
+A widely used technique for applying textures to 3D objects is \textit{texture mapping}. Texture mapping describes the process of projecting a two-dimensional image onto the surface of a three-dimensional model in order to add visual detail \cite{watt1993computergraphics}. During rendering, the graphics system samples values from the texture image and uses them to determine the appearance of the surface.
+
+To correctly map textures onto geometry, each point on the surface must correspond to coordinates in the texture image. These coordinates are typically called \textit{UV coordinates}. The letters $U$ and $V$ refer to the axes of the two-dimensional texture space and represent the horizontal and vertical directions of the texture image \cite{wiki_texture_mapping}. In practice, the surface of a 3D model is parameterized into this two-dimensional coordinate system so that texture images can be applied to it.
+
+The use of textures significantly improves rendering efficiency. Instead of modeling every visual detail explicitly, textures allow complex patterns to be stored in images and reused across many surfaces \cite{akenine2018realtime}. This makes texture mapping particularly important in real-time applications such as games and simulations where computational resources are limited.
+
+Modern rendering systems often use multiple textures to represent different surface properties. The most common texture type is a \textit{color texture} (also called a diffuse texture), which stores the base color of a surface. In addition, other texture maps can represent different physical properties of a material. For example, \textit{normal maps} store small variations in surface orientation that affect lighting calculations, while \textit{specular} or \textit{roughness maps} control how light is reflected from the surface \cite{akenine2018realtime}.
+
+Despite their advantages, traditional image-based textures also have several limitations. Image textures are static resources and usually created manually or obtained from photographs. As a result, they provide limited flexibility and may show visible repetition when applied repeatedly across large surfaces \cite{ebert2003texturing}. Furthermore, large scenes may require many different texture images, which increases memory usage and storage requirements.
+
+To address these limitations, alternative approaches such as \textit{procedural textures} have been developed. Procedural textures generate patterns algorithmically rather than storing them as images. Because these textures are defined by mathematical functions and parameters, they can produce theoretically unlimited resolution and allow flexible variations of patterns \cite{ebert2003texturing, wiki_procedural_texture}.
+
+Procedural texturing techniques are widely used to model natural materials such as wood, marble, stone, or clouds. These materials often contain stochastic structures that are difficult to capture with static images but can be described effectively using noise functions and other procedural algorithms \cite{ebert2003texturing}. Because of their flexibility and scalability, procedural methods have become an important research area in computer graphics.
+
+Understanding how textures are represented and applied to surfaces is an important foundation for studying algorithmic texture synthesis. In the context of this thesis, texture representation provides the conceptual basis for investigating how textures can be generated algorithmically and how such generated textures can approximate a given target texture.
+
+\section{Fundamentals of Texture Synthesis}
+
+Texture synthesis refers to the process of automatically generating large texture images from smaller samples or from mathematical descriptions. The goal of texture synthesis is to produce textures that visually resemble natural or structured materials while avoiding visible repetition or artifacts \cite{ebert2003texturing}. Texture synthesis techniques are widely used in computer graphics because they allow the creation of detailed surfaces without the need to manually design large texture images.
+
+Textures can generally be divided into two categories: \textit{example-based textures} and \textit{procedural textures}. Example-based methods generate new textures by analyzing and extending a given input image, while procedural methods generate textures using mathematical functions or algorithms \cite{akenine2018realtime}. Both approaches aim to reproduce characteristic patterns and statistical properties of textures.
+
+Example-based texture synthesis became an important research topic in the late 1990s. One of the earliest influential approaches was introduced by Efros and Leung, who proposed a non-parametric method that generates new textures by sampling pixels from a source texture based on neighborhood similarity \cite{efros1999texturesynthesis}. In this approach, new pixels are generated sequentially by comparing the surrounding neighborhood with similar regions in the input texture. The algorithm then selects pixel values that maintain local statistical properties of the original texture.
+
+\clearpage
+While the Efros-Leung method demonstrated promising results, it was computationally expensive because each new pixel required a search through the entire source texture. Later work addressed this limitation by introducing more efficient methods. For example, Efros and Freeman proposed the \textit{image quilting} algorithm, which synthesizes textures by copying and stitching together larger patches from a sample image \cite{efros2001imagequilting}. By working with patches instead of individual pixels, the algorithm significantly improves synthesis speed while preserving large-scale structures in the texture.
+
+In contrast to example-based approaches, procedural texture synthesis generates textures using mathematical descriptions rather than image samples. Procedural textures are defined by algorithms that describe how patterns should be generated across a surface \cite{ebert2003texturing}. These algorithms often use functions such as noise, fractals, or domain transformations to simulate natural patterns.
+
+One of the most influential procedural techniques is \textit{Perlin noise}, which was introduced by Ken Perlin as a method for generating natural-looking stochastic patterns \cite{ebert2003texturing}. Noise functions are commonly used to model materials such as clouds, marble, or terrain. By combining multiple noise functions at different frequencies, complex patterns such as fractal textures can be generated.
+
+Procedural textures provide several advantages compared to image-based textures. Because they are defined algorithmically, they can be evaluated at arbitrary resolution and require little storage space \cite{akenine2018realtime}. In addition, procedural textures are highly parameterizable, which allows artists or developers to easily modify the appearance of the generated patterns.
+
+Despite these advantages, procedural approaches may struggle to reproduce specific target textures that contain complex or irregular patterns. Example-based approaches, on the other hand, can reproduce textures more faithfully but often require a suitable input sample and may introduce artifacts if the synthesis process is not carefully controlled \cite{ebert2003texturing}.
+
+For this reason, many modern systems combine ideas from both approaches. Hybrid techniques may use procedural models to generate general structures while relying on statistical analysis or optimization methods to approximate specific textures. These developments illustrate that texture synthesis is a broad research area that includes many different methods and algorithms.
+
+Understanding the fundamental principles of texture synthesis is important for the investigation conducted in this thesis. In particular, the distinction between example-based and procedural methods provides the foundation for analyzing algorithmic approaches such as procedural, rule-based, and optimization-based texture generation.
+
+\clearpage
+\section{Procedural Texture Generation}
+
+Procedural texture generation refers to the creation of textures using mathematical functions and algorithms rather than pre-existing image data. Instead of storing texture information in images, procedural textures are defined by a set of computational rules that generate the texture values during rendering \cite{ebert2003texturing}. This approach allows textures to be generated dynamically and provides a high level of flexibility.
+
+One of the main advantages of procedural textures is that they require very little storage space. Since the texture is generated from mathematical functions, only the parameters of the algorithm must be stored instead of large image files \cite{akenine2018realtime}. As a result, procedural textures can produce textures with theoretically unlimited resolution and without visible tiling artifacts that often occur when repeating image textures.
+
+Procedural textures are typically based on mathematical functions that generate patterns across a surface. One of the most influential techniques in procedural texturing is \textit{noise-based texturing}. Noise functions generate pseudo-random values that vary smoothly across space and can be used to simulate natural variations found in materials such as stone, marble, clouds, or terrain \cite{ebert2003texturing}. A well-known example is \textit{Perlin noise}, which was introduced by Ken Perlin and is widely used to generate natural-looking stochastic textures.
+
+By combining multiple noise functions with different frequencies and amplitudes, more complex patterns can be created. A common technique is \textit{fractal Brownian motion (fBm)}, which generates fractal-like structures by summing several layers of noise at different scales \cite{ebert2003texturing}. These layered noise functions allow procedural models to simulate complex natural phenomena while still being controlled by a small number of parameters.
+
+Another important property of procedural textures is their parameterization. Because the texture generation process is defined algorithmically, parameters can be adjusted to control features such as scale, color variation, or pattern density. This makes procedural textures particularly useful in applications where textures must be generated dynamically or adapted to different environments \cite{akenine2018realtime}. For example, many game engines use procedural texturing techniques to generate terrain, vegetation, or surface materials in large virtual worlds.
+
+Despite their advantages, procedural textures also have limitations. Designing procedural models that accurately reproduce specific real-world textures can be challenging and often requires significant expertise. In many cases, procedural approaches are better suited for generating generic or stylized textures rather than exactly replicating a specific input texture \cite{ebert2003texturing}.
+
+Nevertheless, procedural texture generation remains an important technique in computer graphics. Its ability to generate scalable, parameterizable, and memory-efficient textures makes it a key component in many modern rendering systems and procedural content generation workflows.
+
+
+\section{Rule-Based Texture Generation}
+
+Rule-based texture generation describes approaches where textures are generated through predefined rules that describe how patterns should emerge on a surface. Instead of relying purely on mathematical functions, rule-based systems define a set of production rules that determine how structures grow or repeat over space \cite{prusinkiewicz1990algorithmic}.
+
+A well-known example of rule-based systems in computer graphics is the use of \textit{L-systems} (Lindenmayer systems). L-systems were originally developed to model the growth of biological structures such as plants and trees \cite{prusinkiewicz1990algorithmic}. In this approach, complex patterns are generated through iterative application of rewriting rules that expand simple initial symbols into more complex structures.
+
+Rule-based approaches are particularly useful for textures that contain regular or hierarchical structures. Examples include brick walls, tile patterns, or architectural elements. In these cases, rules can describe how individual components are arranged and repeated across the surface \cite{ebert2003texturing}. This allows the generation of textures that maintain structural consistency while still introducing controlled variations.
+
+Another advantage of rule-based systems is that they can generate patterns that exhibit global structure. While procedural noise functions typically produce stochastic patterns, rule-based methods can enforce relationships between elements of the texture. For example, rules can define how shapes align with each other, how patterns repeat, or how structures grow across a surface.
+
+Rule-based texture generation is also closely related to the broader field of \textit{procedural modeling}. Procedural modeling techniques use rule systems or grammars to generate complex structures such as buildings, cities, or vegetation automatically. These approaches are widely used in computer graphics and game development to create large environments with consistent structural patterns.
+
+However, rule-based approaches also present challenges. Designing appropriate rules often requires manual effort and domain knowledge. If the rule system is too simple, the resulting textures may appear repetitive or artificial. On the other hand, very complex rule systems can become difficult to control or modify.
+
+Despite these challenges, rule-based texture generation provides a powerful way to model structured patterns and hierarchical textures. When combined with procedural or optimization-based techniques, rule-based approaches can contribute to flexible and controllable texture synthesis systems.
+
+\section{Optimization-Based Texture Approximation}
+
+Optimization-based texture approximation refers to methods that attempt to reproduce or approximate a target texture by adjusting parameters of a generative model. Instead of directly copying pixels from an input image, these approaches formulate texture generation as an optimization problem. The goal is to find parameters for a texture model such that the generated texture resembles a given target texture according to a defined similarity measure \cite{ebert2003texturing}.
+
+In many procedural texture systems, textures are generated using mathematical functions or algorithms that are controlled by parameters. These parameters may define properties such as scale, noise frequency, color variation, or structural patterns. By adjusting these parameters, different variations of a texture can be generated. Optimization-based approaches attempt to automatically determine parameter values that produce textures similar to a reference texture \cite{akenine2018realtime}.
+
+A key component of such methods is the definition of a \textit{similarity metric}. The similarity metric measures how closely the generated texture matches the target texture. Various statistical and perceptual metrics have been proposed for this purpose. For example, textures may be compared using statistical properties such as color histograms, frequency spectra, or spatial correlations between pixels \cite{ebert2003texturing}. More advanced approaches also use perceptual metrics that attempt to model how humans perceive visual similarity.
+
+One influential approach to texture modeling is based on statistical analysis of image features. Portilla and Simoncelli proposed a method that represents textures using a set of statistical features derived from wavelet transforms \cite{portilla2000parametric}. By matching these statistics between a synthesized image and a reference texture, new images can be generated that reproduce the characteristic appearance of the original texture.
+
+More recently, optimization techniques have also been used in combination with machine learning methods. For example, neural style transfer approaches use deep neural networks to capture statistical representations of textures and optimize images so that their feature statistics match those of a target texture \cite{gatys2015texture}. These methods demonstrate that optimization can effectively reproduce complex texture structures.
+
+Optimization algorithms used for texture approximation can vary depending on the problem formulation. Gradient-based methods may be used when the texture model is differentiable, allowing parameters to be updated using gradient descent techniques. In other cases, heuristic optimization methods such as evolutionary algorithms or simulated annealing may be applied when gradients are not easily available.
+
+Despite their potential, optimization-based texture synthesis also introduces challenges. The optimization process can be computationally expensive, especially when evaluating complex similarity metrics or high-resolution textures. In addition, defining an appropriate similarity metric remains difficult, since visually similar textures may differ significantly in their pixel-level representation.
+
+Nevertheless, optimization-based approaches provide an important framework for approximating target textures using algorithmic models. By automatically adjusting model parameters, these techniques allow procedural or rule-based texture generators to reproduce specific visual patterns. In the context of this thesis, optimization-based methods play a central role in investigating how algorithmically generated textures can be adjusted to approximate a given reference texture.
+
+\section{Texture Similarity Metrics and Evaluation}
+
+When evaluating texture synthesis methods, it is necessary to measure how similar a generated texture is to a target texture. Since textures often contain stochastic patterns and local variations, comparing them directly on a pixel-by-pixel basis is usually not sufficient. Two textures may look visually similar even if their individual pixel values differ significantly. Therefore, evaluation methods often rely on statistical or perceptual similarity metrics \cite{ebert2003texturing}.
+
+One common approach is to compare statistical properties of textures. Textures can be characterized by features such as color distributions, spatial correlations, or frequency patterns. For example, color histograms can be used to compare the distribution of colors between two textures, while frequency-based analysis can measure how patterns repeat at different spatial scales. By comparing these statistical features, it is possible to estimate how closely a generated texture matches the structural characteristics of a target texture \cite{ebert2003texturing}.
+
+Another widely used metric is the \textit{Structural Similarity Index (SSIM)}. SSIM measures the similarity between two images by comparing local patterns of pixel intensities that have been normalized for luminance and contrast. Unlike simple metrics such as mean squared error, SSIM attempts to model aspects of human visual perception and is therefore often better suited for evaluating visual similarity \cite{wang2004ssim}. Because of this property, SSIM is commonly used in image processing and computer graphics to assess image quality.
+
+More advanced approaches use feature-based representations of textures. For example, the parametric texture model proposed by Portilla and Simoncelli compares images based on statistical features derived from wavelet transforms \cite{portilla2000parametric}. By matching these statistical descriptors, textures can be compared based on their structural properties rather than their exact pixel values.
+
+Despite the availability of quantitative metrics, evaluating texture synthesis methods often also requires qualitative analysis. Human observers are very sensitive to visual artifacts such as repetition patterns, discontinuities, or unnatural structures. As a result, visual inspection is frequently used together with quantitative metrics to assess the quality of synthesized textures \cite{akenine2018realtime}.
+
+\clearpage
+In the context of this thesis, texture similarity metrics are used to evaluate how well algorithmically generated textures approximate a given target texture. Both quantitative measures and qualitative visual comparisons may be considered in order to analyze the strengths and limitations of the investigated approaches.
+
+
+\section{Applications of Algorithmic Texture Synthesis}
+
+Algorithmic texture synthesis has many practical applications in computer graphics and related fields. By generating textures algorithmically instead of storing them as static images, it becomes possible to create detailed and scalable visual content with relatively low memory requirements \cite{akenine2018realtime}.
+
+One important application area is real-time rendering in video games and interactive simulations. Large virtual environments often require many different surface textures, such as terrain, vegetation, or building materials. Procedural texture generation allows these textures to be created dynamically and adapted to different environments, which helps reduce storage requirements and enables greater variation in visual appearance \cite{ebert2003texturing}.
+
+Another important application is procedural content generation. In this context, algorithmic methods are used to automatically generate elements of virtual worlds, including landscapes, cities, and environmental details. Texture synthesis plays a key role in these systems because it allows large environments to contain visually rich surface details without requiring extensive manual design \cite{shaker2016pcg}.
+
+Texture synthesis is also used in film production and visual effects. Procedural techniques allow artists to generate complex natural materials such as clouds, fire, water, or rock surfaces. Because procedural models can be parameterized and modified easily, they provide a flexible tool for creating visually complex scenes \cite{ebert2003texturing}.
+
+In addition to entertainment applications, texture synthesis techniques are also used in image processing and computer vision. For example, synthesized textures may be used for image editing, image completion, or texture transfer between images. These techniques allow existing images to be modified or extended while preserving their visual characteristics.
+
+Overall, algorithmic texture synthesis provides powerful tools for generating visual detail in digital environments. Its ability to create scalable, parameterizable, and diverse textures makes it an important technique in modern computer graphics and procedural modeling systems.
+
+\clearpage
+\section{Summary and Research Gap}
+
+This chapter reviewed the main concepts and approaches related to algorithmic texture synthesis. Texture representation and texture mapping were introduced as fundamental techniques in computer graphics that allow detailed surface appearance to be created without increasing geometric complexity \cite{akenine2018realtime}. Building on this foundation, several different approaches for generating textures algorithmically were discussed.
+
+First, the general principles of texture synthesis were presented. Texture synthesis methods aim to generate textures that reproduce the visual characteristics of natural or structured patterns. Approaches can generally be divided into example-based methods and algorithmic methods \cite{ebert2003texturing}. Example-based methods extend or rearrange information from an existing texture sample, while algorithmic methods generate textures directly through mathematical models or rule systems.
+
+Procedural texture generation represents one of the most widely used algorithmic approaches. Procedural textures use mathematical functions such as noise functions or fractal models to create patterns across a surface \cite{ebert2003texturing}. These techniques are efficient in terms of memory usage and allow textures to be generated at arbitrary resolution. However, designing procedural models that reproduce a specific target texture can be difficult and often requires manual parameter tuning.
+
+Rule-based texture generation provides another approach for creating structured textures. In rule-based systems, patterns are generated through sets of rules that describe how structures should emerge or repeat across a surface. Examples include grammar-based modeling and L-systems, which are commonly used to describe hierarchical or structured patterns \cite{prusinkiewicz1990algorithmic}. While rule-based methods are effective for generating structured patterns, designing suitable rule systems can also be complex.
+
+Optimization-based approaches attempt to address these limitations by treating texture synthesis as an optimization problem. In this case, parameters of a texture model are automatically adjusted in order to approximate a given target texture \cite{portilla2000parametric}. This requires defining suitable similarity metrics that measure how closely the generated texture matches the reference texture. Metrics such as structural similarity (SSIM) or statistical feature comparisons are often used for this purpose \cite{wang2004ssim}.
+
+Despite the progress in this field, several challenges remain. Procedural and rule-based methods provide flexible and scalable texture generation but may struggle to accurately reproduce specific real-world textures. Optimization-based approaches can improve the similarity between generated and target textures, but they often depend on carefully designed metrics and can be computationally expensive.
+
+The research gap addressed in this thesis lies in the practical investigation of how different algorithmic texture synthesis approaches can approximate a given target texture. In particular, the thesis focuses on procedural, rule-based, and optimization-based methods and evaluates how effectively these approaches can generate textures that resemble a reference texture. By implementing and comparing these methods, the work aims to provide insights into their strengths, limitations, and suitability for typical computer graphics applications.
