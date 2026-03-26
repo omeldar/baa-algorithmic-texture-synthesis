@@ -4,7 +4,14 @@ In computer graphics, textures are used to represent surface details of objects 
 
 A widely used technique for applying textures to 3D objects is \textit{texture mapping}. Texture mapping describes the process of projecting a two-dimensional image onto the surface of a three-dimensional model in order to add visual detail \cite{watt1993computergraphics}. During rendering, the graphics system samples values from the texture image and uses them to determine the appearance of the surface.
 
-To correctly map textures onto geometry, each point on the surface must correspond to coordinates in the texture image. These coordinates are typically called \textit{UV coordinates}. The letters $U$ and $V$ refer to the axes of the two-dimensional texture space and represent the horizontal and vertical directions of the texture image \cite{wiki_texture_mapping}. In practice, the surface of a 3D model is parameterized into this two-dimensional coordinate system so that texture images can be applied to it.
+\begin{figure}[H]
+    \centering
+    \img[width=0.8\textwidth]{figures/02/texture-mapping-on-cube.png}
+    {Texture mapping process. (1) Untextured cube geometry (own illustration), (2) diffuse texture maps for different cube faces (top and side) from the Faithful 64x Resource Pack \cite{faithful64}, (3) textured cube after applying the textures (own illustration).}
+    \label{fig:texture-mapping-cube}
+\end{figure}
+
+To correctly map textures onto geometry, each point on the surface must correspond to coordinates in the texture image. These coordinates are typically called \gls{uv}. The letters $U$ and $V$ refer to the axes of the two-dimensional texture space and represent the horizontal and vertical directions of the texture image \cite{wiki_texture_mapping}. In practice, the surface of a 3D model is parameterized into this two-dimensional coordinate system so that texture images can be applied to it.
 
 The use of textures significantly improves rendering efficiency. Instead of modeling every visual detail explicitly, textures allow complex patterns to be stored in images and reused across many surfaces \cite{akenine2018realtime}. This makes texture mapping particularly important in real-time applications such as games and simulations where computational resources are limited.
 
