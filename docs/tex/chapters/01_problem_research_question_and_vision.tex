@@ -1,14 +1,12 @@
 \section{Problem}
 
-In computer graphics, the realistic rendering of surfaces plays a crucial role in the visual quality of generated images. One widely used technique for this purpose is texture mapping, where image textures are applied to geometric surfaces to simulate visual detail such as wood, stone, or fabric. Traditionally, these textures are obtained from pre-existing images that are mapped onto surfaces.
+In computer graphics, realistic surface rendering is essential for high visual quality. A common technique is texture mapping, where image-based textures are applied to geometric surfaces to simulate materials such as wood, stone, or fabric. However, this approach has notable limitations: fixed image textures lack flexibility, scalability, and parameterization, making them less suitable for dynamic or procedurally generated environments.
 
-While this approach is widely adopted, it has several limitations. For example, fixed image textures often lack flexibility, scalability, and parameterization, which makes them less suitable for dynamic or procedurally generated environments.
+Algorithmic texture synthesis offers an alternative by generating textures through computational methods rather than relying on pre-existing images. These include procedural approaches based on mathematical functions, rule-based methods that define pattern formation, and optimization-based techniques that estimate parameters to approximate a given target texture.
 
-An alternative approach is algorithmic texture synthesis, where textures are generated automatically using computational methods. Instead of relying on pre-recorded images, texture are produced through algorithms that define structural properties, patterns, and variations. Procedural methods generate textures based on mathematical functions or algorithms, while rule-based methods describe textures through sets of rules that define how patterns should emerge. In addition, optimization-based techniques can be used to estimate parameters that allow generated textures to approximate a given target texture.
+A central challenge is that algorithmically generated textures cannot exactly reproduce real-world samples due to structural differences. Consequently, texture approximation is formulated as an optimization problem, where model parameters are adjusted to maximize similarity to a target texture according to a defined metric.
 
-A key challenge in this domain is the approximation of a target texture using algorithmic techniques. Since algorithmically generated textures differ structurally from concrete image samples, an exact reproduction of a given texture is typically not possible. Instead, the task can be formulated as an optimization problem, where model parameters are adjusted so that the generated texture resembles the target texture as closely as possible according to a defined similarity metric.
-
-The problem addressed in this thesis is therefore the investigation of algorithmic texture synthesis approaches and their capability to approximate target textures using procedural, rules-based, and optimization-based methods. In particular, it is important to understand how such methods can be implemented, parametrized, and evaluated in the context of computer graphics applications.
+This thesis therefore investigates algorithmic texture synthesis methods and their ability to approximate target textures, with a focus on procedural, rule-based, and optimization-based approaches, as well as their implementation, parameterization, and evaluation in computer graphics applications.
 
 \section{Research Questions}
 
@@ -31,10 +29,10 @@ These research questions guide the investigation of algorithmic techniques and p
 
 \section{Vision}
 
-The long-term vision of this work is to contribute to a better udnerstanding of algorithmic texture generation methods and their practical applicability in computer graphics. By exploring procedural, rule-based, and optimization-based approaches, this thesis aims to demonstrate how textures can be generated in a flexible and parameter-driven manner rather than relying solely on static image resources.
+The goal of this work is to advance the understanding of algorithmic texture generation and its practical applicability in computer graphics. By exploring procedural, rule-based, and optimization-based methods, the thesis demonstrates how textures can be generated in a flexible, parameter-driven manner instead of relying on static image resources.
 
-Such approaches have the potential to enable more scalable and adaptable workflows in areas such as real time graphics, game development, simulation environments, and procedural world generation. Algorithmic methods allow textures to be generated dynamically, modified through parameters, and adapted to different contexts without the need for large texture libraries.
+Such approaches enable more scalable and adaptable workflows in areas including real-time graphics, game development, simulation, and procedural world generation. Algorithmic methods support dynamic texture creation, parameter-based modification, and context-dependent adaptation without requiring large texture libraries.
 
-In this context, the thesis envisions a prototype system that demonstrates how parameterizable texture models can be implemented and evaluated. The results of this work may provide insights into the advantages and limitations of different algorithmic texture synthesis approaches and highlight their suitability for typical computer graphics applications.
+To support this vision, the thesis proposes a prototype system for implementing and evaluating parameterizable texture models. The results aim to provide insights into the strengths and limitations of different synthesis approaches and assess their suitability for typical computer graphics applications.
 
-Ultimately, the findings may serve as a basis for further research and development in procedural content generation, where algorithmic methods are increasingly used to create complex and visually rich digital environments.
+Ultimately, this work contributes to ongoing research in procedural content generation, where algorithmic techniques are increasingly used to create complex and visually rich environments.

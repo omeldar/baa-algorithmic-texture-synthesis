@@ -17,10 +17,18 @@ The use of textures significantly improves rendering efficiency. Instead of mode
 
 Modern rendering systems often use multiple textures to represent different surface properties. The most common texture type is a \textit{color texture} (also called a diffuse texture), which stores the base color of a surface. In addition, other texture maps can represent different physical properties of a material. For example, \textit{normal maps} store small variations in surface orientation that affect lighting calculations, while \textit{specular} or \textit{roughness maps} control how light is reflected from the surface \cite{akenine2018realtime}.
 
+\begin{figure}[H]
+    \centering
+    \img[width=0.9\textwidth]{figures/02/texture-map-comparison.png}
+    {Comparison of different texture maps and their influence on surface appearance. Top: texture maps used (Poly Haven \cite{polyhaven_rock_wall_16}). Left: diffuse (albedo) map only. Right: combination of diffuse, normal, and height (displacement) maps. Bottom: corresponding rendered results showing increasing surface detail.}
+    \label{fig:texture-map-comparison}
+\end{figure}
+
 Despite their advantages, traditional image-based textures also have several limitations. Image textures are static resources and usually created manually or obtained from photographs. As a result, they provide limited flexibility and may show visible repetition when applied repeatedly across large surfaces \cite{ebert2003texturing}. Furthermore, large scenes may require many different texture images, which increases memory usage and storage requirements.
 
 To address these limitations, alternative approaches such as \textit{procedural textures} have been developed. Procedural textures generate patterns algorithmically rather than storing them as images. Because these textures are defined by mathematical functions and parameters, they can produce theoretically unlimited resolution and allow flexible variations of patterns \cite{ebert2003texturing, wiki_procedural_texture}.
 
+\clearpage
 Procedural texturing techniques are widely used to model natural materials such as wood, marble, stone, or clouds. These materials often contain stochastic structures that are difficult to capture with static images but can be described effectively using noise functions and other procedural algorithms \cite{ebert2003texturing}. Because of their flexibility and scalability, procedural methods have become an important research area in computer graphics.
 
 Understanding how textures are represented and applied to surfaces is an important foundation for studying algorithmic texture synthesis. In the context of this thesis, texture representation provides the conceptual basis for investigating how textures can be generated algorithmically and how such generated textures can approximate a given target texture.
