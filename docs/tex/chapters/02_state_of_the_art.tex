@@ -41,12 +41,32 @@ Textures can generally be divided into two categories: \textit{example-based tex
 
 Example-based texture synthesis became an important research topic in the late 1990s. One of the earliest influential approaches was introduced by Efros and Leung, who proposed a non-parametric method that generates new textures by sampling pixels from a source texture based on neighborhood similarity \cite{efros1999texturesynthesis}. In this approach, new pixels are generated sequentially by comparing the surrounding neighborhood with similar regions in the input texture. The algorithm then selects pixel values that maintain local statistical properties of the original texture.
 
-\clearpage
+\begin{figure}[H]
+    \centering
+    \img[width=1\textwidth]{figures/02/efros-and-leung-comparison.png}
+    {Illustration of the Efros -- Leung texture synthesis process. (1) A small sample patch from the input texture used as the initial seed. (2) The resulting synthesized texture generated pixel by pixel based on neighborhood similarity. (3) The highlighted region (red) shows the area of the synthesized texture that closely resembles the input patch, as it originates from the initial seed and is expanded during the synthesis process.}
+    \label{fig:efros-and-leung-comparison}
+\end{figure}
+
 While the Efros-Leung method demonstrated promising results, it was computationally expensive because each new pixel required a search through the entire source texture. Later work addressed this limitation by introducing more efficient methods. For example, Efros and Freeman proposed the \textit{image quilting} algorithm, which synthesizes textures by copying and stitching together larger patches from a sample image \cite{efros2001imagequilting}. By working with patches instead of individual pixels, the algorithm significantly improves synthesis speed while preserving large-scale structures in the texture.
+
+\begin{figure}[H]
+    \centering
+    \img[width=1\textwidth]{figures/02/image-quitting-comparison.png}
+    {Image quilting synthesis. From left to right: source texture with highlighted patches, original texture, synthesized result, and correspondence visualization showing how patches from the input are copied and stitched to form the output.}
+    \label{fig:image-quitting-comparison}
+\end{figure}
 
 In contrast to example-based approaches, procedural texture synthesis generates textures using mathematical descriptions rather than image samples. Procedural textures are defined by algorithms that describe how patterns should be generated across a surface \cite{ebert2003texturing}. These algorithms often use functions such as noise, fractals, or domain transformations to simulate natural patterns.
 
 One of the most influential procedural techniques is \textit{Perlin noise}, which was introduced by Ken Perlin as a method for generating natural-looking stochastic patterns \cite{ebert2003texturing}. Noise functions are commonly used to model materials such as clouds, marble, or terrain. By combining multiple noise functions at different frequencies, complex patterns such as fractal textures can be generated.
+
+\begin{figure}[H]
+    \centering
+    \img[width=1\textwidth]{figures/02/perlin-multiple-examples.png}
+    {Multiple examples of Perlin noise illustrating variations produced by different parameter settings.}
+    \label{fig:perlin-examples}
+\end{figure}
 
 Procedural textures provide several advantages compared to image-based textures. Because they are defined algorithmically, they can be evaluated at arbitrary resolution and require little storage space \cite{akenine2018realtime}. In addition, procedural textures are highly parameterizable, which allows artists or developers to easily modify the appearance of the generated patterns.
 
@@ -66,6 +86,13 @@ One of the main advantages of procedural textures is that they require very litt
 Procedural textures are typically based on mathematical functions that generate patterns across a surface. One of the most influential techniques in procedural texturing is \textit{noise-based texturing}. Noise functions generate pseudo-random values that vary smoothly across space and can be used to simulate natural variations found in materials such as stone, marble, clouds, or terrain \cite{ebert2003texturing}. A well-known example is \textit{Perlin noise}, which was introduced by Ken Perlin and is widely used to generate natural-looking stochastic textures.
 
 By combining multiple noise functions with different frequencies and amplitudes, more complex patterns can be created. A common technique is \textit{fractal Brownian motion (fBm)}, which generates fractal-like structures by summing several layers of noise at different scales \cite{ebert2003texturing}. These layered noise functions allow procedural models to simulate complex natural phenomena while still being controlled by a small number of parameters.
+
+\begin{figure}[H]
+    \centering
+    \img[width=1\textwidth]{figures/02/perlin-octaves-comparison.png}
+    {Illustration of fractal Brownian motion (fBm) using Perlin noise. Increasing numbers of octaves are combined from left to right, adding higher-frequency detail at each step and producing progressively more complex, multi-scale structures.}
+    \label{fig:perlin-octaves-comparison}
+\end{figure}
 
 Another important property of procedural textures is their parameterization. Because the texture generation process is defined algorithmically, parameters can be adjusted to control features such as scale, color variation, or pattern density. This makes procedural textures particularly useful in applications where textures must be generated dynamically or adapted to different environments \cite{akenine2018realtime}. For example, many game engines use procedural texturing techniques to generate terrain, vegetation, or surface materials in large virtual worlds.
 
