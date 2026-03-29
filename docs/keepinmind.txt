@@ -1,0 +1,1 @@
+- Example based texture synthesis: Zwar gut, wenn man im vorinhein weiss, wie gross man die Texturen braucht und diese im vorhinein computet. Aber nicht gut für realtime procedural world gen + texture generation da viele abhängigkeiten (seuqentielle Schritte)
