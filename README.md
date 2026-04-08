@@ -1,6 +1,7 @@
 # Algorithmic Texture Synthesis
 
 Documentation: https://omeldar.github.io/baa-algorithmic-texture-synthesis/main.pdf
+
 Release: https://baa.omeldar.com/
 
 Bachelor Thesis Project
