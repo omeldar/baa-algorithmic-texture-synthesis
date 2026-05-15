@@ -142,21 +142,6 @@ Despite their potential, optimization-based texture synthesis also introduces ch
 
 Nevertheless, optimization-based approaches provide an important framework for approximating target textures using algorithmic models. By automatically adjusting model parameters, these techniques allow procedural or rule-based texture generators to reproduce specific visual patterns. In the context of this thesis, optimization-based methods play a central role in investigating how algorithmically generated textures can be adjusted to approximate a given reference texture.
 
-\section{Texture Similarity Metrics and Evaluation}
-
-When evaluating texture synthesis methods, it is necessary to measure how similar a generated texture is to a target texture. Since textures often contain stochastic patterns and local variations, comparing them directly on a pixel-by-pixel basis is usually not sufficient. Two textures may look visually similar even if their individual pixel values differ significantly. Therefore, evaluation methods often rely on statistical or perceptual similarity metrics \cite{ebert2003texturing}.
-
-One common approach is to compare statistical properties of textures. Textures can be characterized by features such as color distributions, spatial correlations, or frequency patterns. For example, color histograms can be used to compare the distribution of colors between two textures, while frequency-based analysis can measure how patterns repeat at different spatial scales. By comparing these statistical features, it is possible to estimate how closely a generated texture matches the structural characteristics of a target texture \cite{ebert2003texturing}.
-
-Another widely used metric is the \textit{Structural Similarity Index (SSIM)}. SSIM measures the similarity between two images by comparing local patterns of pixel intensities that have been normalized for luminance and contrast. Unlike simple metrics such as mean squared error, SSIM attempts to model aspects of human visual perception and is therefore often better suited for evaluating visual similarity \cite{wang2004ssim}. Because of this property, SSIM is commonly used in image processing and computer graphics to assess image quality.
-
-More advanced approaches use feature-based representations of textures. For example, the parametric texture model proposed by Portilla and Simoncelli compares images based on statistical features derived from wavelet transforms \cite{portilla2000parametric}. By matching these statistical descriptors, textures can be compared based on their structural properties rather than their exact pixel values.
-
-Despite the availability of quantitative metrics, evaluating texture synthesis methods often also requires qualitative analysis. Human observers are very sensitive to visual artifacts such as repetition patterns, discontinuities, or unnatural structures. As a result, visual inspection is frequently used together with quantitative metrics to assess the quality of synthesized textures \cite{akenine2018realtime}.
-
-\clearpage
-In the context of this thesis, texture similarity metrics are used to evaluate how well algorithmically generated textures approximate a given target texture. Both quantitative measures and qualitative visual comparisons may be considered in order to analyze the strengths and limitations of the investigated approaches.
-
 
 \section{Applications of Algorithmic Texture Synthesis}
 
@@ -172,7 +157,20 @@ In addition to entertainment applications, texture synthesis techniques are also
 
 Overall, algorithmic texture synthesis provides powerful tools for generating visual detail in digital environments. Its ability to create scalable, parameterizable, and diverse textures makes it an important technique in modern computer graphics and procedural modeling systems.
 
-\clearpage
+\section{Existing Systems and Tools for Texture Synthesis}
+
+Various systems and tools for procedural texture synthesis already exist in both industry and research. These solutions range from artist-oriented material authoring tools to research-focused procedural generation frameworks.
+
+One of the most widely used procedural material tools is Adobe Substance 3D Designer \cite{substance_designer}. The software uses a node-based workflow in which textures and materials are generated through interconnected procedural operations instead of manual image editing. Similar approaches are also used by Material Maker \cite{material_maker}, an open-source procedural material editor focused on graph-based texture generation.
+
+In addition to dedicated material tools, modern graphics software such as Blender \cite{blender}, Houdini \cite{houdini}, and Unreal Engine \cite{unreal_engine} integrate procedural texturing directly into larger rendering and content generation systems. These platforms provide shader-based and node-based material systems that support procedural workflows, parameterized materials, and real-time rendering integration.
+
+Besides industrial applications, procedural texture synthesis also remains an active research area. Recent research investigates semantic procedural generation, optimization-based texture approximation, and AI-assisted material generation \cite{wang2017semantic}. Such approaches aim to automate procedural workflows and improve the approximation of target textures through parameter estimation and higher-level generation techniques.
+
+Although these systems provide powerful procedural capabilities, they are primarily designed for production workflows and content creation rather than controlled scientific experimentation. Many tools abstract internal implementation details and combine numerous rendering optimizations, making direct comparison of algorithms and reproducible runtime measurements more difficult.
+
+For this reason, this thesis proposes a dedicated research prototype specifically designed for controlled experimentation and evaluation of procedural and rule-based texture synthesis approaches in real-time environments.
+
 \section{Summary and Research Gap}
 
 This chapter reviewed the main concepts and approaches related to algorithmic texture synthesis. Texture representation and texture mapping were introduced as fundamental techniques in computer graphics that allow detailed surface appearance to be created without increasing geometric complexity \cite{akenine2018realtime}. Building on this foundation, several different approaches for generating textures algorithmically were discussed.

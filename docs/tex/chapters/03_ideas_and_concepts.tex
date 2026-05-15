@@ -1,18 +1,14 @@
-\section{Motivation and Conceptual Overview}
+The previous chapter introduced the theoretical foundations and existing approaches related to algorithmic texture synthesis. Based on this foundation, this chapter presents the conceptual design decisions and ideas that guide the practical part of this thesis.
 
-In modern computer graphics, the use of image-based textures remains a widely adopted approach for enhancing the visual detail. However, as discussed in Chapter 2, such textures are inherently limited in terms of scalability, flexibility, and variation. In particular, when applied repeatedly across large surfaces or multiple objects, static textures often lead to visible repetition artefacts, which can reduce visual realism and immersion. These limitations become especially apparaent in procedurally generated environments, where large amounts of content are created dynamically.
+First, the intended use case and the role of the developed research prototype are discussed. Afterwards, the limitations of existing tools and frameworks in the context of this work are analyzed in order to motivate the development of a custom implementation. Finally, the methodological considerations and requirements for the experimental evaluation are outlined.
 
-The motivation of this work is to explore whether algorithmic texture synthesis can address these limitations by generating textures dynamically at runtime. Instead of relying on pre-authored texture assets, the goal is to create textures through computational methods that allow for variation, parameterization, and adaptability. This enables the generation of unique textures for different surfaces without requiring additional memory for storing large texture datasets. As a result, algorithmic approaches offer the potential to improve both visual diversity and resource efficiency in computer graphics applications.
+\section{Use Case and Research Prototype Concept}
 
-To investigate this, a conceptual approach is proposed in which textures are generated individually for each surface within a procedurally defined environment. The central idea is to treat texture generation as a parameter-driven process, where global and local inputs influence the final appearance of a texture. This allows the same underlying algorithm to produce a wide range of variations, depending on parameter configurations such as seeds, scaling factors, or noise characteristics. Consequently, the system enables controlled experimentation with different synthesis methods and their resulting visual outputs.
+This thesis investigates algorithmic texture synthesis methods within the context of procedural real-time graphics applications. Such applications often require large amounts of visual content while maintaining interactive rendering performance and efficient memory usage.
 
-The primary objective of this chapter is therefore to define the conceptual foundation for analyzing algorithmic texture synthesis in a practical context. Rather than focusing on a specific application domain, the work aims to conduct a generalized study that investigates the feasibility of such approaches, the conditions under which they can be applied, and their inherent limitations. Particular attention is given to the trade-off between visual quality and computational performance, as real-time generation imposes strict constraints on execution time. This conceptual perspective forms the basis for the subsequent implementation and evaluation presented in later chapters.
+To investigate procedural, rule-based, and optimization-based texture synthesis approaches under controlled conditions, this thesis proposes a dedicated research prototype. The prototype serves as an experimental platform for implementing, testing, and evaluating different texture synthesis methods within a simplified procedural environment.
 
-\section{Use Case Definition: Procedural Environments}
-
-To investigate the applicability of algorithmic texture synthesis, a simplified procedural environment is defined as the central use case of this work. Rather than focusing on a fully developed game or simulation system, the environment serves as a controlled test scenario in which different texture generation approaches can be implemented, observed, and compared. This abstraction allows the study to concentrate on the core research objective, namely the feasibility and behavior of algorithmically generated textures under practical conditions.
-
-The procedural environment consists of a terrain surface combined with a set of simple geometric objects, such as boxes, which act as placeholders for more complex assets like rocks or tree trunks. Each object is composed of multiple surfaces, and each surface can be assigned a specific material type. These materials represent abstract categories such as ground, stone, or wood, and are used to determine which texture generation method is applied. This setup enables a structured and repeatable way of assigning and evaluating textures across different elements of the scene.
+Instead of focusing on production-ready rendering features, the system is designed primarily for reproducibility, parameter experimentation, runtime analysis, and comparison of synthesis approaches. The prototype combines procedural scene generation, configurable material systems, and runtime texture synthesis in order to provide a controllable environment for scientific evaluation.
 
 \begin{figure}[H]
     \centering
@@ -21,112 +17,119 @@ The procedural environment consists of a terrain surface combined with a set of 
     \label{fig:proc_env_with_boxes}
 \end{figure}
 
-A key characteristic of the use case is that textures are not predefined but generated dynamically for each surface at runtime. Instead of applying a single texture to an entire object or reusing the same image across multiple instances, the system generates unique textures based on algorithmic rules and parameter configurations. This approach directly addresses the problem of visible repetition in traditional texture mapping and allows each object instance to exhibit slight visual differences, even when sharing the same material category.
+The following sections describe the intended use case, the motivation for a custom implementation, and the requirements that guided the conceptual design of the prototype.
 
-The environment is further controlled through a global seed value, which influences the random aspects of the generation process. By modifying this seed, different variations of the entire environment can be produced while maintaining reproducibility. Additionally, local parameters associated with each material allow fine-grained control over the appearance of generated textures. This combination of global and local control mechanisms enables systematic experimentation and comparison of different synthesis methods.
+\subsection{Procedural Real-Time Environments}
 
-Another important aspect of the use case is its focus on real-time applicability. The environment is designed in such a way that textures must be generated within a short time frame, without relying on extensive precomputation. This reflects realistic constraints found in dynamically generated worlds, where content is created on demand as the user interacts with the system. As a result, the use case provides a suitable basis for analyzing both the visual quality and the computational performance of the implemented approaches.
+Procedural real-time environments are interactive virtual environments in which terrain, objects, materials, or other scene elements are generated algorithmically during runtime instead of being fully created manually beforehand. Such approaches are commonly used in video games, simulations, and procedural world generation systems.
 
-Overall, the defined procedural environment serves as a minimal yet representative testbed for evaluating algorithmic texture synthesis. It balances simplicity and flexibility, allowing different methods to be integrated and compared while maintaining a consistent experimental setup. This makes it possible to derive meaningful insights into the strengths, limitations, and practical applicability of the proposed concepts.
+A major advantage of procedural environments is their ability to generate large and varied scenes while reducing storage requirements and manual content creation effort. However, generating content dynamically during runtime also introduces challenges related to rendering performance, scalability, and controllability.
 
-\section{Concept of Per-Surface Texture Generation}
+The prototype developed in this thesis addresses these challenges through a simplified browser-based procedural environment. The system generates terrain structures and scene objects deterministically using configurable parameters and seeds. Different texture synthesis methods can then be applied dynamically in order to evaluate their visual characteristics, parameter controllability, and runtime behavior under identical conditions.
 
-A central concept of this work is the generation of textures on a per-surface basis rather than applying a single texture uniformly across entire objects or large areas. Traditional texture mapping typically assigns one texture to a whole object or reuses the same texture across multiple instances. While efficient, this approach often leads to visible repetition and reduces the perceived realism of a scene. To address this limitation, the proposed concept generates a distinct texture for each individual surface, even if multiple surfaces share the same material type.
+The environment therefore serves as a practical testing context for investigating algorithmic texture synthesis approaches in scenarios relevant to modern procedural rendering applications.
 
-The idea of per-surface texture generation introduces a finer level of granularity in the rendering process. Each surface of an object is treated as an independent entity for which a texture is generated based on a set of parameters and algorithmic rules. This allows similar objects, such as multiple stones or wooden elements, to exhibit subtle variations in appearance without requiring separate texture assets. As a result, the visual diversity of the scene is significantly increased while maintaining a consistent material identity.
+\subsection{Purpose of the Research Prototype}
 
-[BILD: Vergleich zwischen klassischem Texture Mapping (gleiche Textur auf mehreren Objekten) und per-surface generierten Texturen mit sichtbarer Variation]
-Caption: Comparison between traditional texture reuse and per-surface texture generation, illustrating the reduction of visible repetition through individual texture instances.
+The primary purpose of the developed prototype is to provide a controllable environment for investigating algorithmic texture synthesis methods under real-time conditions. Instead of functioning as a production-ready rendering engine, the system serves as an experimental platform for implementing, testing, and comparing procedural, rule-based, and optimization-based approaches.
 
-The generation process is driven by both global and local inputs. A global seed ensures reproducibility across the entire environment, while local parameters introduce variation at the level of individual surfaces. For example, two surfaces assigned the same material may still differ due to slight variations in parameter values derived from their position, orientation, or additional randomized offsets. This combination allows the system to maintain coherence while avoiding uniformity.
+A central goal of the prototype is reproducibility. By using deterministic generation techniques and configurable parameters, experiments can be repeated consistently under identical conditions. This allows the influence of different texture synthesis methods and parameter configurations to be analyzed systematically.
 
-From a conceptual perspective, this approach can be seen as a shift from asset-based to function-based texture representation. Instead of storing textures as static images, textures are defined as functions that can be evaluated for each surface independently. This aligns with the principles of procedural generation discussed in Chapter 2 and enables theoretically unlimited variation without increasing memory consumption. However, it also introduces additional computational overhead, as textures must be generated repeatedly during runtime.
+In addition, the prototype enables runtime analysis and comparison of texture synthesis approaches with respect to visual quality, flexibility, parameter controllability, and rendering performance. The platform therefore acts as a bridge between the theoretical concepts discussed in the previous chapter and the practical evaluation conducted later in this thesis.
 
-Another important aspect of this concept is its compatibility with different texture synthesis methods. Whether procedural, rule-based, or example-based approaches are used, they can all be applied within the per-surface framework. The abstraction of “texture as a function” allows these methods to be integrated uniformly, making it possible to compare their behavior under identical conditions. This flexibility is essential for the subsequent analysis, where different approaches are evaluated with respect to quality, variation, and performance.
+\subsection{Potential Applications and Benefits}
 
-Overall, the concept of per-surface texture generation provides the foundation for achieving high visual diversity in procedurally generated environments. By generating textures individually and dynamically, the system reduces repetition artifacts and enables more natural-looking scenes. At the same time, it introduces new challenges related to performance and parameter control, which are further investigated in the following chapters.
+Although the prototype is primarily designed for research purposes, the investigated concepts are also relevant for practical computer graphics applications. Procedural texture synthesis is widely used in areas such as procedural content generation, terrain rendering, video games, simulations, and interactive real-time graphics systems.
 
-\section{Integration of Texture Synthesis Methods}
+The developed platform may therefore provide value for experimentation, education, and future research related to procedural rendering techniques. In addition, the prototype demonstrates how parameterized texture generation can reduce dependency on static texture assets while increasing scalability and variation in virtual environments.
 
-In order to investigate the capabilities and limitations of algorithmic texture generation, the proposed system integrates multiple texture synthesis methods within a unified framework. Rather than focusing on a single approach, the system is designed to support procedural, rule-based, and example-based methods, enabling a comparative analysis under consistent conditions. This integration allows different techniques to be applied to the same use case and evaluated with respect to their visual output, flexibility, and computational performance.
+Another benefit of the prototype is its modular and controllable design, which allows different synthesis methods and parameter configurations to be tested under reproducible conditions. This supports comparative evaluation and may help identify strengths and limitations of different algorithmic approaches in practical rendering scenarios.
 
-Each texture synthesis method is implemented as a modular component that can be assigned to a specific material within the environment. Materials act as an abstraction layer between scene geometry and texture generation, allowing different algorithms to be applied without modifying the underlying objects. For example, a “stone” material may use a procedural noise-based method, while a “wood” material could rely on a rule-based pattern generation approach. This separation ensures that methods remain interchangeable and can be evaluated independently of the scene structure.
+\section{Analysis of Existing Tools and Frameworks}
 
-[BILD: Architekturdiagramm des Systems mit Modulen für Procedural, Rule-Based und Example-Based Methoden, die über Materialien an Objekte gebunden sind]
-Conceptual system architecture showing the integration of multiple texture synthesis methods as modular components assigned to materials.
+As discussed in Chapter 2, various systems and tools for procedural texture synthesis already exist in both industry and research. Many of these systems provide advanced procedural material generation capabilities and highly flexible node-based workflows.
 
-The modular design further enables the combination of different synthesis approaches, supporting hybrid methods where appropriate. For instance, a procedural base pattern can be enhanced by rule-based modifications or adjusted using parameters derived from example-based analysis. Such combinations reflect trends identified in the state of the art, where hybrid approaches are often used to balance generality and realism. By allowing these combinations within a single system, the framework provides a flexible basis for experimentation.
+However, the requirements of this thesis differ from the goals of typical production-oriented content creation tools. In particular, the focus of this work lies on controlled experimentation, reproducibility, parameter evaluation, and comparison of different synthesis approaches under identical runtime conditions.
 
-Another important aspect of the integration is the standardization of input and output interfaces. All synthesis methods operate on a common set of inputs, such as surface coordinates, material parameters, and global seed values, and produce texture data in a consistent format. This abstraction ensures that different methods can be compared directly, as they operate under the same conditions and constraints. It also simplifies the extension of the system, as new methods can be added without requiring significant changes to the overall architecture.
+The following sections therefore analyze the limitations of existing systems in the context of this research and motivate the development of a dedicated custom implementation.
 
-From an experimental perspective, this integrated approach enables systematic evaluation across multiple dimensions. By applying different methods to the same surfaces and materials, it becomes possible to analyze differences in visual quality, variation, controllability, and performance. Furthermore, the modular structure allows the selective activation or deactivation of methods, facilitating controlled experiments and reproducible results.
+\subsection{Limitations for this Research Context}
 
-Overall, the integration of multiple texture synthesis methods within a unified and modular framework is a key aspect of the proposed concept. It not only supports the comparison of different approaches but also enables the exploration of hybrid solutions and the identification of method-specific strengths and limitations. This forms an essential basis for the implementation and evaluation presented in the subsequent chapters.
+Existing procedural material tools such as Substance Designer, Blender Shader Nodes, Houdini, or Unreal Engine Material Systems provide powerful workflows for creating procedural textures and materials. However, these systems are primarily designed for production workflows and artist-oriented content creation rather than scientific experimentation.
 
-\section{Parameterization and Control}
+Many existing solutions abstract low-level implementation details and integrate numerous rendering optimizations internally. While this improves usability and performance for production environments, it makes controlled comparison of algorithms and reproducible runtime measurements more difficult.
 
-A fundamental aspect of the proposed texture generation system is the use of parameterization to control the visual appearance of generated textures. Instead of relying on fixed outputs, all synthesis methods are designed to expose a set of adjustable parameters that influence the resulting patterns. This allows textures to be modified dynamically without changing the underlying algorithm, enabling both controlled variation and reproducibility. Parameterization therefore plays a central role in bridging the gap between purely algorithmic generation and practical usability.
+Furthermore, existing systems are typically not designed specifically for comparative evaluation of procedural, rule-based, and optimization-based texture synthesis approaches within a unified experimental environment.
 
-The parameters can be divided into global and local categories. Global parameters, such as a shared seed value, influence the overall randomness and ensure that results can be reproduced consistently across different runs. In contrast, local parameters are associated with individual materials or surfaces and define specific characteristics such as scale, frequency, amplitude, or pattern intensity. This distinction allows the system to maintain coherence at the environment level while still introducing variation at the surface level.
+\subsection{Motivation for a Custom Implementation}
 
-[BILD: UI-Screenshot der Web-App mit sichtbaren Parametern wie Seed, Scale, Octaves, etc.]
-User interface of the prototype system showing adjustable parameters for texture generation, enabling interactive control over visual outcomes.
+Due to the limitations of existing tools, this thesis proposes a dedicated research prototype specifically designed for controlled experimentation and evaluation of algorithmic texture synthesis methods.
 
-The parameter-driven approach also enables intuitive interaction with the system. By exposing parameters through a user interface, it becomes possible to explore the behavior of different synthesis methods in real time. Small adjustments to parameters can lead to significant visual changes, making it easier to understand the influence of each parameter on the generated texture. This interactive exploration is particularly useful for identifying meaningful parameter ranges and for comparing different methods under similar conditions.
+A custom implementation allows full control over texture generation algorithms, parameter handling, runtime measurements, and evaluation workflows. This makes it possible to investigate how different synthesis methods behave under identical conditions while maintaining reproducibility and transparency of the implemented systems.
 
-In addition to manual control, parameterization provides a foundation for systematic experimentation and potential optimization. Since textures are defined by a set of parameters, it becomes possible to analyze how variations in these parameters affect visual quality and performance. This is especially relevant in the context of approximating target textures, where parameters may be adjusted to minimize the difference between generated and desired results. Although full optimization is not the primary focus of this work, the parameterized design ensures that such extensions remain feasible.
+In addition, the prototype can be tailored directly to the research questions and experimental requirements of this thesis instead of adapting existing production-oriented tools for scientific evaluation purposes.
 
-Another important benefit of parameterization is reproducibility. By storing parameter configurations, including seed values and method-specific settings, generated textures can be recreated exactly at a later point in time. This is essential for scientific evaluation, as it allows experiments to be repeated and results to be verified. Furthermore, reproducibility supports consistency in applications where deterministic behavior is required, such as synchronized environments or networked systems.
 
-Overall, parameterization and control are key components of the proposed concept, enabling flexibility, experimentation, and reproducibility in algorithmic texture generation. By defining textures as functions of adjustable parameters, the system provides a powerful mechanism for exploring different synthesis methods and understanding their behavior in a structured and controlled manner. This forms an important basis for the evaluation of controllability and performance in later chapters.
+\subsection{Requirements}
 
-\section{Performance Considerations}
+Based on the research goals and evaluation objectives of this thesis, several functional and non-functional requirements for the research prototype can be identified. Since the platform is intended primarily for experimentation and analysis rather than production use, the requirements focus strongly on controllability, reproducibility, and comparative evaluation of texture synthesis methods.
 
-An essential aspect of algorithmic texture generation in procedural environments is the ability to produce textures efficiently at runtime. Unlike traditional approaches, where textures are precomputed and loaded from storage, the proposed system generates textures dynamically as needed. This introduces additional computational overhead, which must be carefully managed to ensure that the system remains responsive, especially in interactive or real-time scenarios.
+For clarity, functional requirements are identified using the prefix \textit{F}, while non-functional requirements use the prefix \textit{NF}.
 
-The relevance of performance becomes particularly evident in environments that are generated or extended during execution. In such cases, textures cannot always be precomputed in advance, as new surfaces may appear dynamically based on user interaction or procedural rules. Consequently, texture generation must occur within a limited time frame to avoid noticeable delays or interruptions in rendering. This creates a fundamental trade-off between visual quality and computational cost, where more complex algorithms may produce better results but require longer execution times.
+Table~\ref{tab:prototype-requirements} summarizes the main requirements of the developed prototype.
 
-[BILD: Diagramm, das den Trade-off zwischen Qualität und Performance zeigt (z. B. einfache vs. komplexe Algorithmen)]
-Conceptual trade-off between visual quality and computational performance in runtime texture generation.
+\begin{table}[H]
+\centering
+\caption{Functional and non-functional requirements of the research prototype}
+\label{tab:prototype-requirements}
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{ID} & \textbf{Type} & \textbf{Description} \\
+\hline
 
-The performance of the system is influenced by several factors, including the complexity of the chosen synthesis method, the resolution of the generated textures, and the number of surfaces that require texture generation. Procedural methods based on noise functions are typically computationally efficient and well-suited for real-time applications, while example-based approaches may require more extensive computations due to similarity searches or pattern matching. Rule-based methods may vary in complexity depending on the number and structure of applied rules.
+F1 & F &
+The system shall support procedural texture synthesis methods such as Perlin noise, Worley noise, and related parameterized algorithms. \\
+\hline
 
-Another important factor is the granularity of texture generation, as introduced in the per-surface concept. While generating textures individually for each surface increases visual variation, it also multiplies the number of required computations. This makes it necessary to evaluate whether such an approach scales effectively as the number of objects in the environment increases. Potential strategies to mitigate performance issues include limiting texture resolution, caching previously generated results, or restricting the number of surfaces generated simultaneously.
+F2 & F &
+The system shall support rule-based texture generation approaches for structured and parameter-controlled texture creation. \\
+\hline
 
-From a practical perspective, it is not always necessary to generate textures strictly in real time for all parts of the environment. In many scenarios, textures can be generated during short loading phases or in advance for areas that are not immediately visible to the user. This allows the system to balance responsiveness and quality by distributing computational effort over time. However, the extent to which such strategies are applicable depends on the structure of the environment and the requirements of the application.
+F3 & F &
+The system shall provide configurable parameters for texture generation algorithms in order to investigate their influence on generated textures. \\
+\hline
 
-Overall, performance considerations play a central role in evaluating the feasibility of algorithmic texture synthesis in procedural environments. The proposed system is designed to explore these constraints by analyzing how different methods behave under varying conditions. This includes examining execution times, scalability, and the impact of parameter choices on computational cost. The insights gained from this analysis will contribute to understanding the practical limits of the presented approach.
+F4 & F &
+The system shall support deterministic generation using configurable seeds to ensure reproducibility of experiments. \\
+\hline
 
-\section{Scope and Limitations}
+F5 & F &
+The system shall allow different texture synthesis methods to be applied and compared within the same procedural environment. \\
+\hline
 
-In order to ensure a focused and well-defined investigation, this work explicitly limits its scope to the study of algorithmic texture synthesis within a simplified procedural environment. The primary objective is not to develop a complete rendering system or game engine, but rather to analyze the feasibility, behavior, and limitations of different texture generation approaches. As a result, the implementation is intentionally restricted to a controlled experimental setup that allows systematic comparison and evaluation.
+F6 & F &
+The system shall collect runtime measurements related to texture generation and rendering performance. \\
+\hline
 
-A key limitation of this work is the exclusion of advanced data-driven methods, particularly deep learning-based approaches. While such methods have shown strong capabilities in generating highly realistic textures, they typically require large datasets, extensive training, and significant computational resources. Since the focus of this thesis lies on classical algorithmic techniques, including procedural, rule-based, and example-based methods, these modern approaches are not considered. This decision ensures that the investigation remains aligned with the goal of understanding parameter-driven and computationally efficient texture generation.
+NF1 & NF &
+The prototype shall provide a controllable and reproducible environment suitable for scientific experimentation and evaluation. \\
+\hline
 
-[BILD: Vergleichsskizze zwischen klassischen algorithmischen Methoden und Deep-Learning-basierten Ansätzen, um die Abgrenzung visuell darzustellen]
-Conceptual distinction between classical algorithmic texture synthesis methods and data-driven approaches such as deep learning, highlighting the scope of this work.
+NF2 & NF &
+The system shall support real-time interaction and visualization during texture generation experiments. \\
+\hline
 
-Another important limitation concerns the level of visual realism addressed in this work. The generated textures are not intended to achieve photorealistic quality, but rather to provide sufficient variation and plausibility within a procedural context. Photorealistic rendering often requires highly detailed models, complex lighting interactions, and advanced material representations, which are beyond the scope of this study. Instead, the focus is placed on analyzing how well algorithmic methods can approximate general texture characteristics and produce visually diverse results.
+NF3 & NF &
+The implementation shall remain modular and extensible to support future texture synthesis methods and evaluation metrics. \\
+\hline
 
-Furthermore, the complexity of the environment itself is deliberately kept low. The use of simple geometric objects, such as terrain patches and box-like structures, serves as a means to isolate the effects of texture generation without introducing additional variables from complex geometry or scene composition. While this abstraction limits the direct applicability of the results to highly detailed real-world scenarios, it provides a clear and controlled basis for evaluating the underlying concepts.
+NF4 & NF &
+The platform shall remain lightweight and executable within a browser-based environment without requiring specialized hardware or software infrastructure. \\
+\hline
 
-The evaluation of performance is also subject to certain constraints. The analysis focuses on relative performance characteristics of different methods within the prototype system rather than providing absolute benchmarks across different hardware platforms. Factors such as browser performance, hardware acceleration, and implementation details may influence the results, and therefore the findings should be interpreted within the context of the chosen experimental setup.
+NF5 & NF &
+The system shall provide sufficient runtime performance to support interactive experimentation with parameterized texture generation methods. \\
+\hline
 
-Overall, the defined scope and limitations reflect a deliberate trade-off between generality and controllability. By restricting the problem space, the work is able to provide a structured and in-depth analysis of algorithmic texture synthesis while maintaining a clear connection to practical use cases. At the same time, these limitations highlight areas for future work, such as the integration of more advanced methods, more complex environments, or higher levels of visual realism.
-
-\section{Conceptual Link to Evaluation}
-
-The concepts introduced in this chapter form the foundation for the implementation and evaluation presented in the subsequent chapters. In particular, the defined use case, the per-surface texture generation approach, and the integration of multiple synthesis methods establish a structured framework for systematic analysis. Rather than evaluating isolated algorithms, the focus is placed on how these methods perform within a consistent and controlled environment, allowing meaningful comparisons to be made.
-
-The evaluation is guided by a set of criteria derived from both the research questions and the conceptual design. These criteria include visual quality, variation, controllability through parameters, and computational performance. Each of these aspects directly corresponds to decisions made in this chapter, such as the emphasis on parameterization, the modular integration of methods, and the requirement for runtime generation. As a result, the evaluation is not arbitrary but closely aligned with the underlying design principles of the system.
-
-[BILD: Übersichtsgrafik, die zeigt wie Kapitel 3 Konzepte (Use Case, Methoden, Parameter, Performance) in die Evaluationskriterien übergehen]
-Conceptual transition from the defined system components and design decisions to the evaluation criteria used in the analysis.
-
-The procedural environment described earlier serves as the central testbed for conducting experiments. By applying different synthesis methods to the same set of surfaces and materials, it becomes possible to observe how variations in algorithms and parameters affect the resulting textures. This setup enables controlled experimentation, where individual factors can be isolated and analyzed without interference from unrelated variables. Consequently, the environment plays a crucial role in ensuring the validity and reproducibility of the evaluation.
-
-In addition, the parameterized design allows for systematic exploration of the solution space. By adjusting parameters such as seed values, frequency, or scale, different configurations can be generated and compared. This makes it possible to study not only the behavior of individual methods but also their sensitivity to parameter changes. Such analysis is particularly relevant when assessing controllability and identifying stable parameter ranges that produce visually plausible results.
-
-The performance considerations discussed previously are also directly incorporated into the evaluation. Execution time and scalability are measured in relation to the complexity of the environment and the chosen synthesis methods. This allows the identification of practical limits, especially in scenarios where textures must be generated dynamically. By analyzing these aspects, the evaluation aims to determine under which conditions the proposed approach is feasible for real-time or near real-time applications.
-
-Overall, this chapter establishes a clear conceptual bridge between design and evaluation. The defined concepts not only guide the implementation but also determine how the system is assessed. This ensures that the evaluation remains focused, relevant, and directly connected to the research objectives of the thesis. The following chapter builds upon this foundation by describing the methodological approach used to carry out the analysis in a structured and reproducible manner.
+\end{tabularx}
+\end{table}

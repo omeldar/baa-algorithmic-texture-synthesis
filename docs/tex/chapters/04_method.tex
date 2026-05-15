@@ -1,1 +1,71 @@
-TBD
+This chapter describes the methodological approach used throughout this thesis. First, the development process and project organization are discussed. Afterwards, the research and evaluation methodology used for investigating algorithmic texture synthesis methods is presented. Finally, the scope and limitations of the conducted work are outlined.
+
+\section{Development Process and Project Management}
+
+The development of the research prototype followed an iterative and prototype-driven process. Instead of implementing the complete system at once, the project was divided into multiple development phases with clearly defined goals and milestones. This allowed features, algorithms, and evaluation approaches to be refined continuously throughout the development process.
+
+Within each phase, a Plan-Do-Check-Act (PDCA) inspired workflow was used. Planned functionality and research objectives were implemented incrementally and regularly reviewed based on technical feasibility, experimental usefulness, and runtime behavior. This iterative approach made it possible to adapt development decisions when new challenges or requirements emerged during implementation.
+
+Project organization and version control were managed using Git and GitHub. Milestones were defined for larger development goals such as terrain generation, procedural texture synthesis, runtime monitoring, and evaluation infrastructure. In addition, regular meetings with the project supervisors were conducted to discuss progress, implementation decisions, and evaluation planning.
+
+\subsection{Iterative Development Approach}
+
+The prototype was developed incrementally in multiple stages. Initial versions focused primarily on creating a stable procedural environment and rendering pipeline. Afterwards, texture synthesis methods, parameter systems, and runtime monitoring functionality were integrated progressively.
+
+This iterative process allowed implementation decisions to be validated continuously through experimentation and testing. It also reduced the risk of introducing unnecessary complexity early in the project.
+
+\subsection{Milestones and Project Organization}
+
+To structure the development process, the project was divided into several milestones corresponding to major system components and research objectives. These milestones included terrain generation, procedural texture implementation, runtime optimization, parameter experimentation, and evaluation preparation.
+
+Version control through GitHub supported incremental development and documentation of implementation progress throughout the project.
+
+\subsection{Use of AI-Assisted Development Tools}
+
+AI-assisted tools were used throughout the project as supportive development and writing aids. Their usage primarily included assistance with research, conceptual understanding and refinement of the English language within the written documentation.
+
+Since English is not the native language of the author, AI tools were particularly helpful for improving readability, grammar, and phrasing of technical explanations. However, implementation, implementation decisions, system architecture, experimental design, and scientific conclusions were developed and evaluated independently by the author.
+
+\section{Research and Evaluation Methodology}
+
+The primary goal of this thesis is the investigation and evaluation of algorithmic texture synthesis methods within procedural real-time environments. To achieve this, a prototype-driven experimental methodology was selected.
+
+Instead of evaluating texture synthesis approaches purely theoretically, the implemented methods are tested within a practical rendering environment under controlled and reproducible conditions. This allows both visual and technical characteristics of the implemented approaches to be analyzed.
+
+\subsection{Experimental Approach}
+
+The evaluation is based on controlled experiments performed within the developed procedural environment. Different texture synthesis approaches are applied to identical scenes, materials, and objects in order to compare their behavior under consistent runtime conditions.
+
+The experiments focus on procedural, rule-based, and partially optimization-based texture synthesis approaches. In addition, parameterized texture generation is investigated to analyze how parameter changes influence generated visual results and runtime performance.
+
+For optimization-based experiments, the prototype includes a parameter search approach in which uploaded target textures can be approximated through adjustable procedural parameters. Due to the scope of this thesis, this process focuses primarily on texture categories that can be represented effectively through procedural models, such as wood-like or structured noise-based textures.
+
+\subsection{Evaluation Criteria and Metrics}
+
+Several evaluation criteria are used to investigate the implemented texture synthesis approaches.
+
+Visual quality is evaluated through qualitative comparison and user feedback collected using evaluation forms. Participants compare generated textures and assess their visual similarity, variation, and overall appearance.
+
+Performance evaluation focuses on runtime-related metrics such as frames per second (FPS) and texture generation time. These measurements allow the computational costs of different synthesis methods to be compared under identical conditions.
+
+Another important evaluation criterion is parameter controllability. This investigates how effectively procedural parameters can be adjusted in order to approximate target textures and influence generated visual structures.
+
+In addition, reproducibility and consistency are considered important aspects of the evaluation due to the research-oriented focus of the prototype.
+
+\subsection{Reproducibility and Controlled Experiments}
+
+To ensure reproducibility, the prototype uses deterministic generation techniques based on configurable seeds and parameter sets. This allows experiments to be repeated consistently under identical conditions.
+
+Controlled experiments are performed by modifying individual parameters or synthesis methods while keeping other environmental conditions constant. This helps isolate the influence of specific algorithms and parameter configurations on generated textures and runtime behavior.
+
+The use of a unified procedural environment further improves comparability between different synthesis approaches since all methods are evaluated within the same rendering and scene generation framework.
+
+\section{Scope and Limitations}
+
+The scope of this thesis focuses primarily on the investigation of procedural, rule-based, and partially optimization-based texture synthesis methods within procedural real-time environments.
+
+The developed prototype is intended as a research platform rather than a production-ready rendering engine. Consequently, the implementation prioritizes controllability, experimentation, and evaluation over graphical completeness or production-level optimization.
+
+Furthermore, the optimization-based parameter search implemented within the prototype is limited to texture categories that can reasonably be approximated using the implemented procedural models. Highly complex or photorealistic textures are outside the scope of this work.
+
+The evaluation is also limited to a relatively small number of representative texture categories and experimental scenarios. As a result, the findings of this thesis should primarily be interpreted within the context of procedural real-time rendering and algorithmic texture synthesis research rather than as universally applicable conclusions for all texture generation approaches.
