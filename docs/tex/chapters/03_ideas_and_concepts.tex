@@ -2,6 +2,30 @@ The previous chapter introduced the theoretical foundations and existing approac
 
 First, the intended use case and the role of the developed research prototype are discussed. Afterwards, the limitations of existing tools and frameworks in the context of this work are analyzed in order to motivate the development of a custom implementation. Finally, the methodological considerations and requirements for the experimental evaluation are outlined.
 
+\section{Analysis of Existing Tools and Frameworks}
+
+As discussed in Chapter 2, various systems and tools for procedural texture synthesis already exist in both industry and research. Many of these systems provide advanced procedural material generation capabilities and highly flexible node-based workflows.
+
+However, the requirements of this thesis differ from the goals of typical production-oriented content creation tools. In particular, the focus of this work lies on controlled experimentation, reproducibility, parameter evaluation, and comparison of different synthesis approaches under identical runtime conditions.
+
+The following sections therefore analyze the limitations of existing systems in the context of this research and motivate the development of a dedicated custom implementation.
+
+\subsection{Limitations for this Research Context}
+
+Existing procedural material tools such as Substance Designer, Blender Shader Nodes, Houdini, or Unreal Engine Material Systems provide powerful workflows for creating procedural textures and materials. However, these systems are primarily designed for production workflows and artist-oriented content creation rather than scientific experimentation.
+
+Many existing solutions abstract low-level implementation details and integrate numerous rendering optimizations internally. While this improves usability and performance for production environments, it makes controlled comparison of algorithms and reproducible runtime measurements more difficult.
+
+Furthermore, existing systems are typically not designed specifically for comparative evaluation of procedural, rule-based, and optimization-based texture synthesis approaches within a unified experimental environment.
+
+\subsection{Motivation for a Custom Implementation}
+
+Due to the limitations of existing tools, this thesis proposes a dedicated research prototype specifically designed for controlled experimentation and evaluation of algorithmic texture synthesis methods.
+
+A custom implementation allows full control over texture generation algorithms, parameter handling, runtime measurements, and evaluation workflows. This makes it possible to investigate how different synthesis methods behave under identical conditions while maintaining reproducibility and transparency of the implemented systems.
+
+In addition, the prototype can be tailored directly to the research questions and experimental requirements of this thesis instead of adapting existing production-oriented tools for scientific evaluation purposes.
+
 \section{Use Case and Research Prototype Concept}
 
 This thesis investigates algorithmic texture synthesis methods within the context of procedural real-time graphics applications. Such applications often require large amounts of visual content while maintaining interactive rendering performance and efficient memory usage.
@@ -45,31 +69,7 @@ The developed platform may therefore provide value for experimentation, educatio
 
 Another benefit of the prototype is its modular and controllable design, which allows different synthesis methods and parameter configurations to be tested under reproducible conditions. This supports comparative evaluation and may help identify strengths and limitations of different algorithmic approaches in practical rendering scenarios.
 
-\section{Analysis of Existing Tools and Frameworks}
-
-As discussed in Chapter 2, various systems and tools for procedural texture synthesis already exist in both industry and research. Many of these systems provide advanced procedural material generation capabilities and highly flexible node-based workflows.
-
-However, the requirements of this thesis differ from the goals of typical production-oriented content creation tools. In particular, the focus of this work lies on controlled experimentation, reproducibility, parameter evaluation, and comparison of different synthesis approaches under identical runtime conditions.
-
-The following sections therefore analyze the limitations of existing systems in the context of this research and motivate the development of a dedicated custom implementation.
-
-\subsection{Limitations for this Research Context}
-
-Existing procedural material tools such as Substance Designer, Blender Shader Nodes, Houdini, or Unreal Engine Material Systems provide powerful workflows for creating procedural textures and materials. However, these systems are primarily designed for production workflows and artist-oriented content creation rather than scientific experimentation.
-
-Many existing solutions abstract low-level implementation details and integrate numerous rendering optimizations internally. While this improves usability and performance for production environments, it makes controlled comparison of algorithms and reproducible runtime measurements more difficult.
-
-Furthermore, existing systems are typically not designed specifically for comparative evaluation of procedural, rule-based, and optimization-based texture synthesis approaches within a unified experimental environment.
-
-\subsection{Motivation for a Custom Implementation}
-
-Due to the limitations of existing tools, this thesis proposes a dedicated research prototype specifically designed for controlled experimentation and evaluation of algorithmic texture synthesis methods.
-
-A custom implementation allows full control over texture generation algorithms, parameter handling, runtime measurements, and evaluation workflows. This makes it possible to investigate how different synthesis methods behave under identical conditions while maintaining reproducibility and transparency of the implemented systems.
-
-In addition, the prototype can be tailored directly to the research questions and experimental requirements of this thesis instead of adapting existing production-oriented tools for scientific evaluation purposes.
-
-
+\clearpage
 \subsection{Requirements}
 
 Based on the research goals and evaluation objectives of this thesis, several functional and non-functional requirements for the research prototype can be identified. Since the platform is intended primarily for experimentation and analysis rather than production use, the requirements focus strongly on controllability, reproducibility, and comparative evaluation of texture synthesis methods.
@@ -85,6 +85,7 @@ Table~\ref{tab:prototype-requirements} summarizes the main requirements of the d
 \begin{tabularx}{\textwidth}{|l|l|X|}
 \hline
 \textbf{ID} & \textbf{Type} & \textbf{Description} \\
+\hline
 \hline
 
 F1 & F &
@@ -109,6 +110,10 @@ The system shall allow different texture synthesis methods to be applied and com
 
 F6 & F &
 The system shall collect runtime measurements related to texture generation and rendering performance. \\
+\hline
+
+F7 & F &
+The system shall support parameter approximation experiments for procedural textures in order to investigate optimization-based texture matching approaches. \\
 \hline
 
 NF1 & NF &
