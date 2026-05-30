@@ -62,17 +62,31 @@ Worley-Artefakte, Main-Thread-Limitierungen, fehlende GPU-Compute-Shaders, Brows
 
 \section{Experimental and Evaluation Infrastructure}
 
+Before conducting the final evaluation, the prototype was inspected to verify which experimental data could be collected reliably. This step was necessary because the implemented system contains several different texture synthesis approaches with different technical characteristics. Some methods are implemented as GPU-based WebGPU shaders, while others are executed on the CPU or in a web worker. As a result, not all methods support the same resolutions, runtime behavior, or reproducibility guarantees.
+
+The inspection showed that the implemented methods expose different parameter sets and export options. For example, the optimization-based method can export parameter configurations and diagnostic information, while the procedural methods are mainly evaluated through generated texture images, parameter settings, and runtime measurements.
+
+This verification step helped define the final evaluation setup. A common resolution of 256x256 pixels was selected for comparison because this resolution is supported by all implemented methods. Higher resolutions are considered only for methods that technically support them. The optimization-based approach currently focuses on the Wood texture model. Therefore, optimization results are interpreted as an investigation of parameter estimation for one representative procedural material model rather than as a general optimization framework for all implemented synthesis methods.
+
 \subsection{Measurement and Monitoring System}
 
-FPS-Messung, Renderzeiten, Texture-Generation-Zeiten, Chunk-Generierungszeiten, Echtzeitdiagramme, Performance.now(), kontinuierliches Monitoring, Ziel objektiver und reproduzierbarer Messungen
+The prototype provides several mechanisms for collecting evaluation data. Runtime-related values such as texture generation time and rendering performance can be measured using browser-based timing functions. In addition, the terrain environment includes monitoring functionality for values such as frames per second, texture generation time, chunk generation time, and render time.
+
+The collected measurement data is intended to support comparison between the implemented synthesis methods under controlled conditions. Since GPU-based and CPU-based methods have different execution characteristics, the evaluation records the execution context of each method separately. This distinction is important because WebGPU shader methods primarily depend on GPU execution, while example-based methods such as pixel-based synthesis or patch-based synthesis depend more strongly on CPU performance and memory access patterns.
 
 \subsection{Evaluation Metrics and Comparison Criteria}
 
-visuelle Qualität, Flexibilität, Reproduzierbarkeit, Parametrierbarkeit, Laufzeitkosten, Speicherverbrauch, Skalierbarkeit, Vergleichbarkeit der Verfahren, qualitative und quantitative Metriken, Bezug zu Forschungsfragen
+The optimization method uses a weighted fitness score based on several image statistics. These include mean brightness, variance, gradient ratio, edge density, and histogram similarity. The individual components are combined into a single scalar fitness value, where higher values indicate a closer match between the generated texture and the target texture.
+
+This metric was selected because exact pixel-level reproduction is not realistic for procedural texture synthesis. Procedural models often generate visually similar structures at different pixel positions. Therefore, statistical and structural characteristics are more suitable than a purely pixel-based error metric for comparing generated and target textures.
 
 \subsection{Reproducibility and Controlled Experiments}
 
-Seed-basierte Reproduzierbarkeit, identische Testbedingungen, kontrollierte Parameteränderungen, standardisierte Szenen und Testfälle, wissenschaftliche Nachvollziehbarkeit, Grundlage für spätere Evaluation
+Reproducibility is an important requirement for the evaluation because the prototype is intended as a research platform rather than a production-ready texture tool. The implementation was inspected to determine which methods support deterministic generation. The procedural shader-based methods use seed-based generation and are therefore expected to reproduce the same output when the same parameters and seed are used. The optimization-based method also uses seeded random values, which makes repeated optimization runs reproducible under identical settings.
+
+However, not all implemented methods provide the same level of reproducibility. The Efros-Leung implementation contains random choices that are not fully controlled by the configured seed. This means that repeated runs may produce slightly different results even when the visible parameters remain unchanged. This behavior is a limitation and is considered when interpreting the reproducibility results.
+
+For the controlled experiments, seeds, texture resolution, target images, and parameter settings are kept constant whenever possible. This allows the influence of individual methods and parameters to be analyzed more clearly.
 
 \section{Summary of the Implementation}
 
