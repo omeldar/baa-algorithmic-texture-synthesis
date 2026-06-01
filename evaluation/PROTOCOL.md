@@ -243,6 +243,7 @@
 | Avg FPS | 61.8 |
 | Avg Render (ms) | 70.78 |
 | Avg Chunk Gen (ms) | 0.057 |
+| Filename | report-vd-1-1780324173325.pdf, timing-data-vd-1-1780324169080.csv |
 
 ---
 
@@ -263,9 +264,10 @@
 **Results:**
 | Metric | Value |
 |--------|-------|
-| Avg FPS | **\_\_** |
-| Avg Render (ms) | **\_\_** |
-| Avg Chunk Gen (ms) | **\_\_** |
+| Avg FPS | 59.6 |
+| Avg Render (ms) | 83.51 |
+| Avg Chunk Gen (ms) | 0.064 |
+| Filename | report-vd-3-1780325016009.pdf, timing-data-vd-3-1780325024778.csv|
 
 ---
 
@@ -286,13 +288,14 @@
 **Results:**
 | Metric | Value |
 |--------|-------|
-| Avg FPS | **\_\_** |
-| Avg Render (ms) | **\_\_** |
-| Avg Chunk Gen (ms) | **\_\_** |
+| Avg FPS | 55.2 |
+| Avg Render (ms) | 73.35 |
+| Avg Chunk Gen (ms) | 0.050 |
+| Filename | report-vd-5-1780333418269.pdf, timing-data-vd-5-1780333413594.csv |
 
 ---
 
-## TEST 10: Texture Reuse Impact (0% reuse)
+## TEST 9: Texture Reuse Impact (0 reuse)
 
 **Objective:** Measure texture generation load with no caching
 
@@ -301,22 +304,29 @@
 |---------|-------|
 | World Seed | 12345 |
 | View Distance | 3 |
-| Terrain Quality | 32 |
-| Texture Reuse Rate | 0.0 |
+| Terrain Quality | 24 |
+| Texture Reuse Rate | 0 |
 | Camera Height | 50 |
 | Camera Distance | 60 |
+| Tree - Trunk | Wood Grain (Default Settings) |
+| Pine - Trunk | Wood Grain (Default Settings) |
+| Rock - Rock | Perlin Noise (Default Settings) |
+| Bush - Main | Simplex / warped (Default Settings) |
 | Auto Move | ON |
 | Recording Duration | 60 seconds |
 
 **Results:**
 | Metric | Value |
 |--------|-------|
-| Avg FPS | **\_\_** |
-| Avg Texture Gen (ms) | **\_\_** |
+| Avg FPS | 48.2 |
+| Avg Texture Gen (ms) | 19.431 |
+| Avg Render (ms) | 540.33 |
+| Avg Chunk Gen (ms) | 0.048|
+| Filename | report-0-reuse-1780334095249.pdf, timing-data-0-reuse-1780334090104.csv |
 
 ---
 
-## TEST 11: Texture Reuse Impact (50% reuse)
+## TEST 10: Texture Reuse Impact (1:25 reuse)
 
 **Configuration:**
 | Setting | Value |
@@ -333,12 +343,15 @@
 **Results:**
 | Metric | Value |
 |--------|-------|
-| Avg FPS | **\_\_** |
-| Avg Texture Gen (ms) | **\_\_** |
+| Avg FPS | 55.2 |
+| Avg Texture Gen (ms) | 19.775 |
+| Avg Render (ms) | 266.90 |
+| Avg Chunk Gen (ms) | 0.050 |
+| Filename | report-25-reuse-1780334997103.pdf, timing-data-25-reuse-1780335002623.csv |
 
 ---
 
-## TEST 12: Texture Reuse Impact (80% reuse)
+## TEST 11: Texture Reuse Impact (1:50 reuse)
 
 **Configuration:**
 | Setting | Value |
@@ -355,87 +368,17 @@
 **Results:**
 | Metric | Value |
 |--------|-------|
-| Avg FPS | **\_\_** |
-| Avg Texture Gen (ms) | **\_\_** |
-
----
-
-## TEST 13: Optimizer Baseline Capture
-
-**Objective:** Test optimizer workflow and baseline comparison
-
-**Instructions:**
-
-1. Go back to main page
-2. Click "Texture Optimizer"
-3. Upload a wood texture reference image
-4. Set Max Iterations: 50
-5. Set Population Size: 20
-6. Click "Start Optimization"
-7. Wait for completion
-8. Export both JSON files
-
-**Results:**
-| Metric | Value |
-|--------|-------|
-| Baseline Score (%) | **\_\_** |
-| Final Score (%) | **\_\_** |
-| Improvement (%) | **\_\_** |
-| Iterations to Best | **\_\_** |
-| Total Time (s) | **\_\_** |
-| Params Filename | **\_\_** |
-
----
-
-## TEST 14: Optimizer with Different Selection Method
-
-**Configuration:**
-| Setting | Value |
-|---------|-------|
-| Max Iterations | 50 |
-| Population Size | 20 |
-| Selection Method | Roulette |
-| Crossover Method | Blend |
-| Same reference image as Test 13 |
-
-**Results:**
-| Metric | Value |
-|--------|-------|
-| Baseline Score (%) | **\_\_** |
-| Final Score (%) | **\_\_** |
-| Improvement (%) | **\_\_** |
-| Iterations to Best | **\_\_** |
-
----
-
-## TEST 15: Static Scene Screenshot
-
-**Objective:** Capture visual quality at rest
-
-**Instructions:**
-
-1. Open Terrain Explorer
-2. Set World Seed: 12345
-3. Set View Distance: 5
-4. Set Terrain Quality: 64
-5. Click "Reset Camera"
-6. Disable Auto Move
-7. Wait 5 seconds for scene to load
-8. Take browser screenshot (F12 > Capture screenshot)
-
-**Results:**
-| Item | Value |
-|------|-------|
-| Screenshot filename | **\_\_** |
-| Visible chunks | **\_\_** |
-| Visual artifacts? | YES / NO |
-| Notes | **\_\_** |
+| Avg FPS | 54.4 |
+| Avg Texture Gen (ms) | 19.587 |
+| Avg Render (ms) | 331.69 |
+| Avg Chunk Gen (ms) | 0.062 |
+| Filename | report-50-reuse-1780336165844.pdf, timing-data-50-reuse-1780336170378.csv |
 
 ---
 
 # PART B: Synthesis Method Comparison
 
-> These tests compare the 7 synthesis methods directly against each other on the
+> These tests compare the synthesis methods directly against each other on the
 > same criteria (generation time, visual quality, resolution scaling, parameter
 > control, tileability). Run all of Part B in the main Texture Lab (NOT the
 > Terrain Explorer). Select each method from the left sidebar.
@@ -448,7 +391,7 @@
 
 ---
 
-## TEST 16: Procedural Method Generation (Defaults)
+## TEST 12: Procedural Method Generation (Defaults)
 
 **Objective:** Generate each procedural (GPU) method at default parameters and
 capture a reference image + subjective quality. Procedural methods render in
@@ -472,7 +415,7 @@ GPU-instant (< 1 frame, no visible delay).
 
 ---
 
-## TEST 17: Example-Based Generation Time @ 128x128
+## TEST 13: Example-Based Generation Time @ 128x128
 
 **Objective:** Measure CPU synthesis time for example-based methods at low
 resolution. These methods display "Generated in X.Xs" when complete.
@@ -502,7 +445,7 @@ resolution. These methods display "Generated in X.Xs" when complete.
 
 ---
 
-## TEST 18: Example-Based Generation Time @ 256x256
+## TEST 14: Example-Based Generation Time @ 256x256
 
 **Objective:** Measure how example-based synthesis time scales with resolution
 (compare directly against Test 17).
@@ -534,7 +477,7 @@ resolution. These methods display "Generated in X.Xs" when complete.
 
 ---
 
-## TEST 19: Common-Resolution Visual Comparison @ 256x256
+## TEST 15: Common-Resolution Visual Comparison @ 256x256
 
 **Objective:** Generate every method that supports 256x256 at the SAME resolution
 so visual quality can be compared fairly side by side.
@@ -559,7 +502,7 @@ so visual quality can be compared fairly side by side.
 
 ---
 
-## TEST 20: Parameter Controllability Comparison
+## TEST 16: Parameter Controllability Comparison
 
 **Objective:** Compare how much visual control each method offers. For each
 method, vary ONE key parameter from min to max and judge how predictably the
@@ -583,7 +526,7 @@ output responds.
 
 ---
 
-## TEST 21: Tileability / Seam Test
+## TEST 17: Tileability / Seam Test
 
 **Objective:** Determine which methods produce seamless/tileable output (key for
 texturing large surfaces). Export a texture, then check if opposite edges would
@@ -607,7 +550,7 @@ tile without a visible seam.
 
 ---
 
-## TEST 22: Method Comparison Matrix (Synthesis)
+## TEST 18: Method Comparison Matrix (Synthesis)
 
 **Objective:** Consolidate all Part B findings into one cross-method comparison.
 Fill from Tests 16-21. Use 1-5 where applicable.
