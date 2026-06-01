@@ -213,7 +213,7 @@
 
 ---
 
-## TEST 7: View Distance Scaling (VD=1)
+## TEST 6: View Distance Scaling (VD=1)
 
 **Objective:** Measure impact of view distance on performance
 
@@ -223,7 +223,7 @@
 | World Seed | 12345 |
 | View Distance | 1 |
 | Terrain Quality | 32 |
-| Texture Reuse Rate | 0.3 |
+| Texture Reuse Rate | 1:3 |
 | Camera Height | 50 |
 | Camera Distance | 60 |
 | Auto Move | ON |
@@ -240,13 +240,13 @@
 **Results:**
 | Metric | Value |
 |--------|-------|
-| Avg FPS | **\_\_** |
-| Avg Texture Gen (ms) | **\_\_** |
-| Avg Chunk Gen (ms) | **\_\_** |
+| Avg FPS | 61.8 |
+| Avg Render (ms) | 70.78 |
+| Avg Chunk Gen (ms) | 0.057 |
 
 ---
 
-## TEST 8: View Distance Scaling (VD=3)
+## TEST 7: View Distance Scaling (VD=3)
 
 **Configuration:**
 | Setting | Value |
@@ -254,7 +254,7 @@
 | World Seed | 12345 |
 | View Distance | 3 |
 | Terrain Quality | 32 |
-| Texture Reuse Rate | 0.3 |
+| Texture Reuse Rate | 1:3 |
 | Camera Height | 50 |
 | Camera Distance | 60 |
 | Auto Move | ON |
@@ -264,12 +264,12 @@
 | Metric | Value |
 |--------|-------|
 | Avg FPS | **\_\_** |
-| Avg Texture Gen (ms) | **\_\_** |
+| Avg Render (ms) | **\_\_** |
 | Avg Chunk Gen (ms) | **\_\_** |
 
 ---
 
-## TEST 9: View Distance Scaling (VD=5)
+## TEST 8: View Distance Scaling (VD=5)
 
 **Configuration:**
 | Setting | Value |
@@ -277,7 +277,7 @@
 | World Seed | 12345 |
 | View Distance | 5 |
 | Terrain Quality | 32 |
-| Texture Reuse Rate | 0.3 |
+| Texture Reuse Rate | 1:3 |
 | Camera Height | 50 |
 | Camera Distance | 60 |
 | Auto Move | ON |
@@ -287,7 +287,7 @@
 | Metric | Value |
 |--------|-------|
 | Avg FPS | **\_\_** |
-| Avg Texture Gen (ms) | **\_\_** |
+| Avg Render (ms) | **\_\_** |
 | Avg Chunk Gen (ms) | **\_\_** |
 
 ---
