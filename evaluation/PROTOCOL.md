@@ -376,233 +376,322 @@
 
 ---
 
-# PART B: Synthesis Method Comparison
+# PART B: Synthesis Method Comparison for Real-Time Feasibility
 
-> These tests compare the synthesis methods directly against each other on the
-> same criteria (generation time, visual quality, resolution scaling, parameter
-> control, tileability). Run all of Part B in the main Texture Lab (NOT the
-> Terrain Explorer). Select each method from the left sidebar.
+> This section evaluates which synthesis methods are suitable for real-time
+> procedural environments. They were evaluated on better hardware. The approach:
 >
-> Method categories:
+> 1. **Elimination Tests (12-14):** Measure CPU-based methods in the Texture Lab
+>    to document why they are NOT feasible for real-time use (generation time >> 16ms frame budget).
 >
-> - **Procedural / GPU:** Perlin, Simplex, Worley, Wood (render in real time, no progress bar, no on-screen time)
-> - **Example-based / CPU:** Efros-Leung, Image Quilting (show progress bar + "Generated in X.Xs")
-> - **Optimisation:** Optimisation-Based (genetic algorithm, optimises Wood)
+> 2. **Real-Time Method Comparison (15-19):** Test the 4 GPU-based methods
+>    (Perlin, Simplex, Worley, Wood) directly IN THE TERRAIN EXPLORER to compare
+>    their real-time performance when applied to scene objects.
+>
+> **Real-time threshold:** 16.67ms per frame (60 FPS) or 33.33ms (30 FPS minimum acceptable)
 
 ---
 
-## TEST 12: Procedural Method Generation (Defaults)
+## TEST 12: CPU Method Elimination - Efros-Leung
 
-**Objective:** Generate each procedural (GPU) method at default parameters and
-capture a reference image + subjective quality. Procedural methods render in
-real time, so there is no on-screen generation time; confirm they are
-GPU-instant (< 1 frame, no visible delay).
+**Objective:** Document why Efros-Leung is NOT suitable for real-time use.
+Measure generation time at multiple resolutions in the Texture Lab.
+
+**Location:** Main Texture Lab (NOT Terrain Explorer)
 
 **Instructions:**
 
-1. Open main Texture Lab (not Terrain Explorer)
-2. For EACH method below: select it in the sidebar, click "Reset" (defaults), wait for render
-3. Click "Export" to save the PNG
-4. Rate visual quality 1-5 subjectively
+1. Select "Efros-Leung" from sidebar
+2. Set Seed = 42, Neighborhood Size = 5, Error Tolerance = 0.1
+3. Generate at 64x64, note time from "Generated in X.Xs"
+4. Generate at 128x128, note time
+5. Generate at 256x256 (max), note time
+6. Download the metrics report
 
 **Results:**
-| Method | Real-time? | Visual Quality (1-5) | PNG Filename |
-|--------|-----------|----------------------|--------------|
-| Perlin | YES / NO | **\_\_** | **\_\_** |
-| Simplex | YES / NO | **\_\_** | **\_\_** |
-| Worley | YES / NO | **\_\_** | **\_\_** |
-| Wood | YES / NO | **\_\_** | **\_\_** |
+| Resolution | Generation Time | vs 16ms Budget | Real-Time Feasible? |
+|------------|-----------------|----------------|---------------------|
+| 64x64 | 8.6 s | 537.5x over | NO |
+| 128x128 | 35.8 s | 2237.5x over | NO |
+| 256x256 | 144.4 s | 9025x over | NO |
+
+**Conclusion:** Efros-Leung generation time is for even only 64x64 textures about 537 times the 16ms frame budget.
+**Reason for elimination:** Efros–Leung involves many sequential steps, making it difficult to parallelize and therefore unsuitable for real-time 3D environments.
 
 ---
 
-## TEST 13: Example-Based Generation Time @ 128x128
+## TEST 13: CPU Method Elimination - Image Quilting
 
-**Objective:** Measure CPU synthesis time for example-based methods at low
-resolution. These methods display "Generated in X.Xs" when complete.
+**Objective:** Document why Image Quilting is NOT suitable for real-time use.
+
+**Location:** Main Texture Lab (NOT Terrain Explorer)
+
+**Instructions:**
+
+1. Select "Image Quilting" from sidebar
+2. Set Seed = 42, Patch Size = 32, Overlap = 8, Error Tolerance = 0.1
+3. Generate at 128x128, note time
+4. Generate at 256x256, note time
+5. Generate at 512x512 (max), note time
+6. Download the metrics report
+
+**Results:**
+| Resolution | Generation Time | vs 16ms Budget | Real-Time Feasible? |
+|------------|-----------------|----------------|---------------------|
+| 128x128 | 0.11 s | 7x over | NO |
+| 256x256 | 0.14 s | 9x over | NO |
+| 512x512 | 0.68 s | 12x over | NO |
+
+**Conclusion:** Image Quilting generation time is even from small textures seven times the 16ms frame budget.
+**Reason for elimination:** Image-Quilting involves many sequential steps, making it difficult to parallelize and therefore unsuitable for real-time 3D environments.
+
+---
+
+## TEST 14: Optimization Method Elimination
+
+**Objective:** Document why GA-based optimization is NOT suitable for real-time use.
+The optimizer runs many iterations to find parameters - measure total optimization time.
+
+**Location:** Texture Optimizer
+
+**Instructions:**
+
+1. Click "Texture Optimizer" on main page
+2. Upload a wood reference image
+3. Set: Max Iterations = 200, Population Size = 20
+4. Start optimization, measure total time to completion
+5. Record iterations per second
+
+**Results:**
+| Metric | Value |
+|--------|-------|
+| Total Optimization Time | 124.1 s |
+| Iterations Completed | 200 |
+| Final Similarity | 93.2% |
+
+**Conclusion:** Optimization requires ~124 seconds total, making it suitable
+only for **offline parameter discovery**, not real-time generation.
+**Use case:** Pre-compute parameters, then use resulting Wood shader in real-time.
+
+---
+
+## TEST 15: Real-Time Method - Perlin Noise in Terrain
+
+**Objective:** Test Perlin noise shader applied to terrain objects in real-time.
+
+**Location:** Terrain Explorer
 
 **Configuration:**
-| Setting | Efros-Leung | Image Quilting |
-|---------|-------------|----------------|
-| Output Width | 128 | 128 |
-| Output Height | 128 | 128 |
-| Seed | 42 | 42 |
-| Neighborhood / Patch Size | 5 | 32 |
-| Error Tolerance | 0.1 | 0.1 |
+| Setting | Value |
+|---------|-------|
+| World Seed | 12345 |
+| View Distance | 3 |
+| Terrain Quality | 32 |
+| Texture Reuse Rate | 1:3 |
+| Camera Height | 50 |
+| Camera Distance | 60 |
+| **Object Texture Assignments:** | |
+| Tree - Trunk | Perlin Noise |
+| Tree - Leaves | Perlin Noise |
+| Pine - Trunk | Perlin Noise |
+| Pine - Leaves | Perlin Noise |
+| Rock - Rock | Perlin Noise |
+| Rock - Shadow | Perlin Noise |
+| Cactus - Body | Perlin Noise |
+| Cactus - Splines | Perlin Noise |
+| Bush - Main | Perlin Noise |
+| Bush - Accent | Perlin Noise |
+| Auto Move | ON |
+| Recording Duration | 60 seconds |
 
 **Instructions:**
 
-1. Select Efros-Leung in sidebar
-2. Set Output Width/Height = 128, other params as above
-3. Wait for synthesis to complete; read "Generated in X.Xs"
-4. Export PNG
-5. Repeat for Image Quilting
+1. Open Terrain Explorer
+2. Expand "Object Slot Overrides" panel
+3. Set ALL object slots to use "Perlin Noise" with default parameters
+4. Set other settings as above
+5. Click "Reset Camera"
+6. Enable Auto Move
+7. Record for 60 seconds
+8. Export CSV and PDF
 
 **Results:**
-| Method | Output Size | Generation Time (s) | Visual Quality (1-5) | PNG Filename |
-|--------|-------------|---------------------|----------------------|--------------|
-| Efros-Leung | 128x128 | **\_\_** | **\_\_** | **\_\_** |
-| Image Quilting | 128x128 | **\_\_** | **\_\_** | **\_\_** |
+| Metric | Value |
+|--------|-------|
+| Avg FPS | 116.9 |
+| Min FPS | 102 |
+| Max FPS | 120 |
+| Avg Texture Gen (ms) | 1.330 |
+| Avg Render (ms) | 155.12 |
+| Real-Time Feasible? | YES |
+| Filename | report-perlin-1780353981013.pdf, timing-data-perlin-1780353988300.csv |
 
 ---
 
-## TEST 14: Example-Based Generation Time @ 256x256
+## TEST 16: Real-Time Method - Simplex Noise in Terrain
 
-**Objective:** Measure how example-based synthesis time scales with resolution
-(compare directly against Test 17).
+**Objective:** Test Simplex noise shader applied to terrain objects in real-time.
+
+**Location:** Terrain Explorer
 
 **Configuration:**
-| Setting | Efros-Leung | Image Quilting |
-|---------|-------------|----------------|
-| Output Width | 256 | 256 |
-| Output Height | 256 | 256 |
-| Seed | 42 | 42 |
-| Neighborhood / Patch Size | 5 | 32 |
-| Error Tolerance | 0.1 | 0.1 |
+| Setting | Value |
+|---------|-------|
+| World Seed | 12345 |
+| View Distance | 3 |
+| Terrain Quality | 32 |
+| Texture Reuse Rate | 1:3 |
+| Camera Height | 50 |
+| Camera Distance | 60 |
+| **Object Texture Assignments:** | |
+| Tree - Trunk | Worley Cracks |
+| Tree - Leaves | Worley Cracks |
+| Pine - Trunk | Worley Cracks |
+| Pine - Leaves | Worley Cracks |
+| Rock - Rock | Worley Cracks |
+| Rock - Shadow | Worley Cracks |
+| Cactus - Body | Worley Cracks |
+| Cactus - Splines | Worley Cracks |
+| Bush - Main | Worley Cracks |
+| Bush - Accent | Worley Cracks |
+| Auto Move | ON |
+| Recording Duration | 60 seconds |
 
 **Instructions:**
 
-1. Select Efros-Leung, set Output Width/Height = 256
-2. Wait for completion; read "Generated in X.Xs"
-3. Export PNG
-4. Repeat for Image Quilting
+1. Set ALL object slots to use "Worley Cracks" with default parameters
+2. Set other settings as above
+3. Click "Reset Camera", Enable Auto Move
+4. Record for 60 seconds
+5. Export CSV and PDF
 
 **Results:**
-| Method | Output Size | Generation Time (s) | Scaling vs 128 (x) | PNG Filename |
-|--------|-------------|---------------------|--------------------|--------------|
-| Efros-Leung | 256x256 | **\_\_** | **\_\_** | **\_\_** |
-| Image Quilting | 256x256 | **\_\_** | **\_\_** | **\_\_** |
-
-> Scaling factor = Test 18 time / Test 17 time. A 4x pixel increase that produces
-> ~4x time indicates linear scaling; higher indicates worse-than-linear.
+| Metric | Value |
+|--------|-------|
+| Avg FPS | 113.4|
+| Min FPS | 10 |
+| Max FPS | 120 |
+| Avg Texture Gen (ms) | 4.674 |
+| Avg Render (ms) | 400.49 |
+| Real-Time Feasible? | NO (because of render times) |
+| Filename | report-worley-1780354462420.pdf, timing-data-worley-1780354474759.csv |
 
 ---
 
-## TEST 15: Common-Resolution Visual Comparison @ 256x256
+## TEST 17: Real-Time Method Comparison - Mixed Realistic Setup
 
-**Objective:** Generate every method that supports 256x256 at the SAME resolution
-so visual quality can be compared fairly side by side.
+**Objective:** Compare all GPU methods in a realistic mixed-texture scenario.
+
+**Location:** Terrain Explorer
+
+**Configuration:**
+| Setting | Value |
+|---------|-------|
+| World Seed | 12345 |
+| View Distance | 3 |
+| Terrain Quality | 32 |
+| Texture Reuse Rate | 1:3 |
+| Camera Height | 50 |
+| Camera Distance | 60 |
+| **Object Texture Assignments:** | |
+| Tree - Trunk | Wood Grain |
+| Tree - Leaves | Simplex Noise |
+| Pine - Trunk | Wood Grain |
+| Pine - Leaves | Perlin Noise |
+| Rock - Rock | Worley Cracks |
+| Bush - Main | Simplex Noise |
+| Auto Move | ON |
+| Recording Duration | 60 seconds |
 
 **Instructions:**
 
-1. For procedural methods (Perlin/Simplex/Worley/Wood), generate at defaults (native GPU resolution)
-2. For example-based methods, reuse the 256x256 PNGs from Test 18
-3. For Optimisation-Based, set Output Size = 256, run a short optimisation (50 iters), export result
-4. Place all PNGs side by side and rate each on the criteria below (1-5)
+1. Set object slots as above (realistic material assignments)
+2. Set other settings as above
+3. Click "Reset Camera", Enable Auto Move
+4. Record for 60 seconds
+5. Export CSV and PDF
 
 **Results:**
-| Method | Realism (1-5) | Detail (1-5) | Visible Artifacts? | Overall (1-5) | PNG Filename |
-|--------|---------------|--------------|--------------------|---------------|--------------|
-| Perlin | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
-| Simplex | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
-| Worley | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
-| Wood | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
-| Efros-Leung | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
-| Image Quilting | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
-| Optimisation | **\_\_** | **\_\_** | YES / NO | **\_\_** | **\_\_** |
+| Metric | Value |
+|--------|-------|
+| Avg FPS | **\_\_** |
+| Min FPS | **\_\_** |
+| Max FPS | **\_\_** |
+| Avg Texture Gen (ms) | **\_\_** |
+| Avg Render (ms) | **\_\_** |
+| Real-Time Feasible? | YES / NO |
+| Filename | **\_\_** |
 
 ---
 
-## TEST 16: Parameter Controllability Comparison
+## TEST 20: GPU Method Generation Time Comparison (Texture Lab)
 
-**Objective:** Compare how much visual control each method offers. For each
-method, vary ONE key parameter from min to max and judge how predictably the
-output responds.
+**Objective:** Measure exact GPU shader generation times in the Texture Lab
+using the new metrics panel. Generate each method 10+ times and record avg/min/max.
+
+**Location:** Main Texture Lab
 
 **Instructions:**
 
-1. Select each method
-2. Drag the listed key parameter from minimum to maximum
-3. Note parameter count (visible sliders) and rate control predictability 1-5
+1. Select each GPU method in sidebar
+2. Click "Reset" to use default parameters
+3. Change the seed parameter 10 times (e.g., 1, 2, 3... 10) to trigger 10 generations
+4. Read avg/min/max from the "Generation Metrics" panel
+5. Click "Report" to download PDF+CSV
 
 **Results:**
-| Method | Key Param Varied | # Params | Predictable Response (1-5) | Notes |
-|--------|------------------|----------|----------------------------|-------|
-| Perlin | scale | 6 | **\_\_** | **\_\_** |
-| Simplex | warp | 5 | **\_\_** | **\_\_** |
-| Worley | edgeWidth | 5 | **\_\_** | **\_\_** |
-| Wood | grainScale | 16 | **\_\_** | **\_\_** |
-| Efros-Leung | neighborhoodSize | 5 | **\_\_** | **\_\_** |
-| Image Quilting | patchSize | 6 | **\_\_** | **\_\_** |
+| Method | Samples | Avg (ms) | Min (ms) | Max (ms) | Report Filename |
+|--------|---------|----------|----------|----------|-----------------|
+| Perlin | 10 | **\_\_** | **\_\_** | **\_\_** | **\_\_** |
+| Simplex | 10 | **\_\_** | **\_\_** | **\_\_** | **\_\_** |
+| Worley | 10 | **\_\_** | **\_\_** | **\_\_** | **\_\_** |
+| Wood | 10 | **\_\_** | **\_\_** | **\_\_** | **\_\_** |
 
 ---
 
-## TEST 17: Tileability / Seam Test
+## Summary: Real-Time Feasibility Matrix
 
-**Objective:** Determine which methods produce seamless/tileable output (key for
-texturing large surfaces). Export a texture, then check if opposite edges would
-tile without a visible seam.
-
-**Instructions:**
-
-1. For each method, export a default texture
-2. In an image editor (or by offsetting the image by 50%), check left/right and top/bottom edge continuity
-3. Mark tileable YES/NO and severity of seam (none / minor / major)
-
-**Results:**
-| Method | Tileable? | Seam Severity | Notes |
-|--------|-----------|---------------|-------|
-| Perlin | YES / NO | none / minor / major | **\_\_** |
-| Simplex | YES / NO | none / minor / major | **\_\_** |
-| Worley | YES / NO | none / minor / major | **\_\_** |
-| Wood | YES / NO | none / minor / major | **\_\_** |
-| Efros-Leung | YES / NO | none / minor / major | **\_\_** |
-| Image Quilting | YES / NO | none / minor / major | **\_\_** |
+| Method         | Category      | Execution | Avg Gen Time | Terrain FPS | Real-Time? | Notes                    |
+| -------------- | ------------- | --------- | ------------ | ----------- | ---------- | ------------------------ |
+| Perlin         | Procedural    | GPU       | **\_\_** ms  | **\_\_**    | YES / NO   | **\_\_**                 |
+| Simplex        | Procedural    | GPU       | **\_\_** ms  | **\_\_**    | YES / NO   | **\_\_**                 |
+| Worley         | Rule-based    | GPU       | **\_\_** ms  | **\_\_**    | YES / NO   | **\_\_**                 |
+| Wood           | Procedural    | GPU       | **\_\_** ms  | **\_\_**    | YES / NO   | Most complex (16 params) |
+| Efros-Leung    | Example-based | CPU       | **\_\_** s   | N/A         | NO         | Eliminated: too slow     |
+| Image Quilting | Example-based | CPU       | **\_\_** s   | N/A         | NO         | Eliminated: too slow     |
+| Optimization   | Optimization  | CPU       | **\_\_** s   | N/A         | NO         | Offline use only         |
 
 ---
 
-## TEST 18: Method Comparison Matrix (Synthesis)
+## Summary Table (Part A)
 
-**Objective:** Consolidate all Part B findings into one cross-method comparison.
-Fill from Tests 16-21. Use 1-5 where applicable.
+| Test | Description  | Avg FPS | Texture Gen (ms) | Pass/Fail |
+| ---- | ------------ | ------- | ---------------- | --------- |
+| 1    | Baseline     | 60      | n/a              | PASS      |
+| 2    | Low Quality  | 61.2    | n/a              | PASS      |
+| 3    | High Quality | 51.1    | n/a              | PASS      |
+| 4    | Repro Run 1  | 60.7    | n/a              | PASS      |
+| 5    | Repro Run 2  | 60.6    | n/a              | PASS      |
+| 6    | VD=1         | 61.8    | n/a              | PASS      |
+| 7    | VD=3         | 59.6    | n/a              | PASS      |
+| 8    | VD=5         | 55.2    | n/a              | PASS      |
+| 9    | Reuse 0%     | 48.2    | 19.431           | PASS      |
+| 10   | Reuse 25%    | 55.2    | 19.775           | PASS      |
+| 11   | Reuse 50%    | 54.4    | 19.587           | PASS      |
 
-**Results:**
-| Method | Category | Speed (1-5) | Visual Quality (1-5) | Control (1-5) | Tileable | Reproducible | Best Use Case |
-|--------|----------|-------------|----------------------|---------------|----------|--------------|---------------|
-| Perlin | Procedural | **\_\_** | **\_\_** | **\_\_** | Y / N | YES | **\_\_** |
-| Simplex | Procedural | **\_\_** | **\_\_** | **\_\_** | Y / N | YES | **\_\_** |
-| Worley | Rule-based | **\_\_** | **\_\_** | **\_\_** | Y / N | YES | **\_\_** |
-| Wood | Procedural | **\_\_** | **\_\_** | **\_\_** | Y / N | YES | **\_\_** |
-| Efros-Leung | Example | **\_\_** | **\_\_** | **\_\_** | Y / N | NO (Math.random) | **\_\_** |
-| Image Quilting | Example | **\_\_** | **\_\_** | **\_\_** | Y / N | YES | **\_\_** |
-| Optimisation | Optimisation | **\_\_** | **\_\_** | **\_\_** | Y / N | YES | **\_\_** |
+## Synthesis Comparison Summary (Part B)
 
-> Speed: 5 = real-time / GPU instant, 1 = many seconds on CPU.
-> Reproducible column pre-filled from code analysis; confirm by re-running with
-> the same seed where possible.
-
----
-
-## Summary Table
-
-| Test | Description   | Avg FPS  | Texture Gen (ms) | Pass/Fail |
-| ---- | ------------- | -------- | ---------------- | --------- |
-| 1    | Baseline      | 60       | n/a              | **\_\_**  |
-| 2    | Low Quality   | **\_\_** | **\_\_**         | **\_\_**  |
-| 3    | High Quality  | **\_\_** | **\_\_**         | **\_\_**  |
-| 4    | Ultra Quality | **\_\_** | **\_\_**         | **\_\_**  |
-| 5    | Repro Run 1   | **\_\_** | **\_\_**         | **\_\_**  |
-| 6    | Repro Run 2   | **\_\_** | **\_\_**         | **\_\_**  |
-| 7    | VD=2          | **\_\_** | **\_\_**         | **\_\_**  |
-| 8    | VD=4          | **\_\_** | **\_\_**         | **\_\_**  |
-| 9    | VD=6          | **\_\_** | **\_\_**         | **\_\_**  |
-| 10   | Reuse 0%      | **\_\_** | **\_\_**         | **\_\_**  |
-| 11   | Reuse 50%     | **\_\_** | **\_\_**         | **\_\_**  |
-| 12   | Reuse 80%     | **\_\_** | **\_\_**         | **\_\_**  |
-| 13   | Optimizer     | N/A      | N/A              | **\_\_**  |
-| 14   | Optimizer Alt | N/A      | N/A              | **\_\_**  |
-| 15   | Screenshot    | N/A      | N/A              | **\_\_**  |
-
-## Synthesis Comparison Summary
-
-| Test | Description                      | Key Output            | Done?    |
-| ---- | -------------------------------- | --------------------- | -------- |
-| 16   | Procedural generation (defaults) | 4 PNGs + quality      | **\_\_** |
-| 17   | Example-based time @ 128         | 2 gen times           | **\_\_** |
-| 18   | Example-based time @ 256         | 2 gen times + scaling | **\_\_** |
-| 19   | Common-res visual comparison     | 7 quality ratings     | **\_\_** |
-| 20   | Parameter controllability        | 6 control ratings     | **\_\_** |
-| 21   | Tileability / seam test          | 6 tileable verdicts   | **\_\_** |
-| 22   | Method comparison matrix         | Consolidated table    | **\_\_** |
+| Test | Description                | Key Output          | Done?    |
+| ---- | -------------------------- | ------------------- | -------- |
+| 12   | Efros-Leung elimination    | Gen times >> 16ms   | **\_\_** |
+| 13   | Image Quilting elimination | Gen times >> 16ms   | **\_\_** |
+| 14   | Optimization elimination   | Total time >> 16ms  | **\_\_** |
+| 15   | Perlin in Terrain          | FPS + Texture Gen   | **\_\_** |
+| 16   | Simplex in Terrain         | FPS + Texture Gen   | **\_\_** |
+| 17   | Worley in Terrain          | FPS + Texture Gen   | **\_\_** |
+| 18   | Wood in Terrain            | FPS + Texture Gen   | **\_\_** |
+| 19   | Mixed realistic setup      | FPS + Texture Gen   | **\_\_** |
+| 20   | GPU method timing (Lab)    | Precise avg/min/max | **\_\_** |
 
 ---
 
@@ -611,21 +700,14 @@ Fill from Tests 16-21. Use 1-5 where applicable.
 - **FPS >= 30:** Acceptable for real-time use
 - **FPS >= 60:** Smooth real-time performance
 - **Texture Gen < 16ms:** Within single frame budget at 60fps
-- **Reproducibility:** Test 5 and 6 values within 5% of each other
-- **Optimizer:** Final score > Baseline score
-- **Procedural methods (Test 16):** must render in real time (GPU-instant)
-- **Example-based scaling (Test 18):** flag if 256 time is > 5x the 128 time (worse-than-linear)
+- **Reproducibility:** Test 4 and 5 values within 5% of each other
+- **CPU method elimination:** Generation time > 1 second = immediate elimination
+- **GPU methods (Tests 15-18):** must maintain >= 30 FPS to pass
 
 ---
 
 ## Notes
 
----
-
----
-
----
-
----
+(Use this space for observations during testing)
 
 ---

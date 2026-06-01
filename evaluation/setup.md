@@ -1,7 +1,5 @@
 # Setup
 
-This is the setup with which the results were measured.
-
 ## Specs
 
 Device: HP Elitebook
