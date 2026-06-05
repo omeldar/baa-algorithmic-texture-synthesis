@@ -36,7 +36,7 @@ Instead of focusing on production-ready rendering features, the system is design
 
 \begin{figure}[H]
     \centering
-    \img[width=1\textwidth]{figures/03/proc_env_with_boxes.png}
+    \img[width=0.8\textwidth]{figures/03/proc_env_with_boxes.png}
     {Simplified procedural environment consisting of a terrain and multiple objects with assigned material categories for texture generation.}
     \label{fig:proc_env_with_boxes}
 \end{figure}
@@ -55,11 +55,28 @@ The environment therefore serves as a practical testing context for investigatin
 
 \subsection{Purpose of the Research Prototype}
 
-The primary purpose of the developed prototype is to provide a controllable environment for investigating algorithmic texture synthesis methods under real-time conditions. Instead of functioning as a production-ready rendering engine, the system serves as an experimental platform for implementing, testing, and comparing procedural, rule-based, and optimization-based approaches.
+The prototype is the central artifact of this thesis. Rather than studying texture synthesis methods only in isolation, it provides an interactive environment in which diffierent approaches can be implemented, parameterized, visualized, and compared under controlled and reproducible conditions.
 
-A central goal of the prototype is reproducibility. By using deterministic generation techniques and configurable parameters, experiments can be repeated consistently under identical conditions. This allows the influence of different texture synthesis methods and parameter configurations to be analyzed systematically.
+The prototype serves three roles:
 
-In addition, the prototype enables runtime analysis and comparison of texture synthesis approaches with respect to visual quality, flexibility, parameter controllability, and rendering performance. The platform therefore acts as a bridge between the theoretical concepts discussed in the previous chapter and the practical evaluation conducted later in this thesis.
+\begin{itemize}
+    \item \textbf{A laboratory} for generating and inspecting individual textures with full parameter control.
+    \item \textbf{A real-time application} that embeds generated  textures in a procedurally created 3D world, demonstrating their behaviour under realistic runtime conditions.
+    \item \textbf{A measurement tool} that records objective performance and quality metrics and exports them for later analysis.
+\end{itemize}
+
+The prototype is therefore not a production renderer but a \textit{research instrument}. Its design prioritizes transparency, reproducibility, and measurability over visual perfection, so that the differences between synthesis methods can be observed and quantified directly.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.45\textwidth]{figures/03/baa-front-screen.png} &
+        \includegraphics[width=0.45\textwidth]{figures/03/baa-back-screen.png} \\[0.5em]
+        (a) & (b)
+    \end{tabular}
+    \caption{(a) shows the front page where parameters can be changed to generate textures, while (b) shows the terrain explorer with which we can test the feasability of using those algorithms in a 3D procedural real-time environment.}
+    \label{fig:two-images}
+\end{figure}
 
 \subsection{Potential Applications and Benefits}
 
