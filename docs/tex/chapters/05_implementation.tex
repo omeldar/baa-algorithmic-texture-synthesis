@@ -60,6 +60,7 @@ A central \texttt{texture-types} module defines every method, its category, and 
     \label{fig:c2}
 \end{figure}
 
+\clearpage
 \subsection{Texture Generation Data Flow}
 
 When the user selects a texture method, the application loads the corresponding method definition from the shared texture-definition module. This definition contains the parameter identifiers, default values, value ranges, the classification category, and the rendering backend. From this definition the user interface automatically generates the matching control elements, so no method-specific UI code is required.
@@ -71,8 +72,56 @@ When the user selects a texture method, the application loads the corresponding 
     \label{fig:dataflow-seq-dia}
 \end{figure}
 
-Whenever a parameter changes, the current parameter set together with the active seed is forwarded to the selected generation pipeline. The system dispatches the request based on whether the method has a GPU shader implementation: procedural methods are routed to the WebGPUm shader pipeline, while example-based methods are executed inside a Web Worker. The generated result is then either shown as a preview in the Texture Synthesis Lab or assigned to material slots inside the Terrain Explorer. Because both consumers read from the same definition, a method only has to be implemented once.
+Whenever a parameter changes, the current parameter set together with the active seed is forwarded to the selected generation pipeline. The system dispatches the request based on whether the method has a GPU shader implementation: procedural methods are routed to the WebGPU shader pipeline, while example-based methods are executed inside a Web Worker. The generated result is then either shown as a preview in the Texture Synthesis Lab or assigned to material slots inside the Terrain Explorer. Because both consumers read from the same definition, a method only has to be implemented once.
 
+\clearpage
+\subsection{Parameter Definition and Control System}
+
+Every texture method declares its parameters declaratively in the shared definition module. A parameter is described by a stable identifier, a display label, an input-control type, optional numeric bounds (minimum, maximum, step), a default value, and an optional description. The supported control types are sliders for continuous numeric values, checkboxes for boolean toggles, text inputs (used among others for the seed), and select inputs for discrete choices.
+
+\begin{table}[H]
+    \centering
+    \caption{Parameter Types}
+    \label{tab:param-types}
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
+    \textbf{Parameter type} & \textbf{Example} & \textbf{Purpose} \\
+    \hline
+    \hline
+    
+    Scale & \texttt{grainScale}, noise scale & Controls overall pattern size \\
+    \hline
+
+    Octaves & fBm layer count & Controls detail complexity \\
+    \hline
+
+    Seed & random seed (text) & Ensures reproducibility and variation \\
+    \hline
+
+    Color & wood light/dark color & Controls visual appearance \\
+    \hline
+
+    Structure Length & \texttt{ridgeStrength}, \texttt{crackStrength} & Controls structural boundaries / detail \\
+    \hline
+
+    Toggle & \texttt{animate} & Enables/disables time-based animation \\
+    \hline
+    
+    \end{tabularx}
+\end{table}
+
+\begin{lstlisting}[style=defaultcode, caption={The actual TextureParameter interface from the source.}, label={lst:textureparam-interface}]
+interface TextureParameter {
+    id: string                                   // stable identifier
+    label: string                                // UI label
+    type: "slider" | "checkbox" | "text" | "select"
+    min?: number; max?: number; step?: number    // bounds for sliders
+    default: number | boolean | string
+    description?: string
+}
+\end{lstlisting}
+
+\clearpage
 \section{Procedural Environment Foundation}
 
 \subsection{Terrain Generation}
@@ -177,6 +226,14 @@ Because all three run on the GPU, generation is effectively instantaneous, which
     \caption{Three different textures generated from the same Wood shader with different parameter settings, demonstrating the range of visual variation achievable through procedural generation.}
     \label{fig:wood-variations}
 \end{figure}
+
+\subsubsection{Wood Grain Shader Implementation}
+
+The Wood shader is implemented as a layered procedural model evaluated once per output texel. First, the texture coordinates are scaled by a grain factor and compressed along one axis (anisotropy) to imitate the directional fibre structure of wood. To avoid perfectly regular, artificial-looking rings, domain warping is applied before the pattern is evaluated: a primary warp displaces the coordinate based on a low-frequency fBm value, and a secondaryt, smaller warp adds organic irregularity.
+
+On the warped coordinates, a base structure is generated using fractal Brownian motion (fBm), which sums several octaves of Perlin noise with decreasing amplitude and increasing frequency. A ridged-noise layer is added on top to create the darker groove and grain lines, and a high-frequency fBm layer introduces fine fibre detail. An optional cellular (Worley) component subtracts crack-like features by measuring the distance to the nearest feature point in a \texttt{3x3} cell neighbourhood. Finally, the scalar pattern value is contrast-shaped and brightness-adjusted, then mapped between two configurable colours, with a subtle low-frequency modulation added for additional realism.
+
+A detailed diagram can be found in Appendix~\ref{app:appendix-woodgrain-flowchart}, Figure~\ref{fig:woodgrain-flowchart}.
 
 \subsection{Rule-Based Texture Models}
 
