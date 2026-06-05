@@ -1,4 +1,4 @@
-This chapter describes the pracitcal realization of the research prototype. It explains the goals of the system, the chosen technology stack, the overall architecture, and the concrete implementation of the procedural environment, the texture synthesis methods, the optimization approach, and the experimental infrastructure used to evaluate them. The aim is to show how the conceptual ideas from the previous chapters were turned into a working, measurable application.
+This chapter describes the practical realization of the research prototype. It explains the goals of the system, the chosen technology stack, the overall architecture, and the concrete implementation of the procedural environment, the texture synthesis methods, the optimization approach, and the experimental infrastructure used to evaluate them. The aim is to show how the conceptual ideas from the previous chapters were turned into a working, measurable application.
 
 \section{System Architecture}
 
@@ -31,7 +31,7 @@ The prototype is a web application, which makes it portable, easy to distribute,
     Example-based methods & Web Workers (CPU) & Non-blocking pixel/patch synthesis \\
     \hline
 
-    Charts \& reports & Recharts, jsPDF, jspdf-autotable & Libe graphs and exportable reports \\
+    Charts \& reports & Recharts, jsPDF, jspdf-autotable & Live graphs and exportable reports \\
     \hline
 
     UI components & Tailwind CSS + shadcn/ui & Consistent, accessible interface \\
@@ -130,7 +130,7 @@ The 3D environment is an infinite, procedurally generated landscape. Terrain hei
 
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Continental shape}: low-frequency fractal Brownian motion (fBm) for large landmasses.
-    \item \textbf{Mountains}: ridged noise masked by a seperate low-frequency field so peaks only appear in certain regions.
+    \item \textbf{Mountains}: ridged noise masked by a separate low-frequency field so peaks only appear in certain regions.
     \item \textbf{Hills and details}: higher-frequency fBm layers for medium and fine variation.
     \item \textbf{Erosion}: turbulence subtracted from the surface to carve valleys.
 \end{itemize}
@@ -198,7 +198,7 @@ The prototype implements seven methods across four categories. The table below g
     Image-Quilting & Example-based & CPU (Worker) & Faster patch-based reproduction \\
     \hline
 
-    Optimisation-Based & Optimization & GPU + CPU & Approximating a target image \\
+    Optimization-Based & Optimization & GPU + CPU & Approximating a target image \\
     \hline
     
     \end{tabularx}
@@ -231,9 +231,27 @@ Because all three run on the GPU, generation is effectively instantaneous, which
 
 The Wood shader is implemented as a layered procedural model evaluated once per output texel. First, the texture coordinates are scaled by a grain factor and compressed along one axis (anisotropy) to imitate the directional fibre structure of wood. To avoid perfectly regular, artificial-looking rings, domain warping is applied before the pattern is evaluated: a primary warp displaces the coordinate based on a low-frequency fBm value, and a secondaryt, smaller warp adds organic irregularity.
 
-On the warped coordinates, a base structure is generated using fractal Brownian motion (fBm), which sums several octaves of Perlin noise with decreasing amplitude and increasing frequency. A ridged-noise layer is added on top to create the darker groove and grain lines, and a high-frequency fBm layer introduces fine fibre detail. An optional cellular (Worley) component subtracts crack-like features by measuring the distance to the nearest feature point in a \texttt{3x3} cell neighbourhood. Finally, the scalar pattern value is contrast-shaped and brightness-adjusted, then mapped between two configurable colours, with a subtle low-frequency modulation added for additional realism.
+On the warped coordinates, a base structure is generated using fractal Brownian motion (fBm), which sums several octaves of Perlin noise with decreasing amplitude and increasing frequency. A ridged-noise layer is added on top to create the darker groove and grain lines, and a high-frequency fBm layer introduces fine fibre detail. An optional cellular (Worley) component subtracts crack-like features by measuring the distance to the nearest feature point in a \texttt{3x3} cell neighbourhood. Finally, the scalar pattern value is contrast-shaped and brightness-adjusted, then mapped between two configurable colors, with a subtle low-frequency modulation added for additional realism.
 
 A detailed diagram can be found in Appendix~\ref{app:appendix-woodgrain-flowchart}, Figure~\ref{fig:woodgrain-flowchart}.
+
+\begin{lstlisting}[style=defaultcode, caption={Core of the Wood fragment shader (WGSL, abbreviated). Domain-warped fBm is combined with ridged noise, fine detail, and Worley-based cracks before contrast shaping and two-color mapping.}, label={lst:core-wood-fragment-shader}]
+// Anisotropic coordinates + domain warp
+var p = uv * GRAIN_SCALE;
+p.x *= ANISOTROPY;
+let warp1 = fbm(vec2f(p.y * WARP_SCALE, 0.0), 3);
+p.x += warp1 * WARP_STRENGTH;
+
+// Layered structure
+var wood = fbm(p, NUM_OCTAVES);                 // base grain
+wood += ridgedFbm(p * 1.5, 3) * RIDGE_STRENGTH; // grooves
+wood += fbm(p * 4.0, 2) * DETAIL_STRENGTH;      // fine fibres
+wood -= pow(1.0 - worley(p * CRACK_SCALE), 3.0) * CRACK_STRENGTH; // cracks
+
+// Shaping + color
+wood = pow(clamp(wood * 0.5 + 0.5, 0.0, 1.0), CONTRAST);
+let color = mix(COLOR_DARK, COLOR_LIGHT, wood);
+\end{lstlisting}
 
 \subsection{Rule-Based Texture Models}
 
@@ -248,7 +266,7 @@ The example-based and optimization methods address a different question: \textit
 \begin{itemize}
     \item \textbf{Efros-Leung} synthesizes a texture pixel by pixel, choosing each new pixel by searching the source image for neighborhoods that resemble the already-synthesized surroundings. It is faithful but computationally expensive.
     \item \textbf{Image-Quilting} works with patches rather than single pixels. It copies overlapping blocks from the source and stitches them along a minimum-error boundary cut, which is considerably faster while preserving larger structures.
-    \item \textbf{Optimisation-Based} synthesis takes a fundamentally different route: instead of copying from the image, it searches for the procedural parameters (currently of the Wood shader) that best reproduce the target. This is implemented as a genetic algorithm.
+    \item \textbf{Optimization-Based} synthesis takes a fundamentally different route: instead of copying from the image, it searches for the procedural parameters (currently of the Wood shader) that best reproduce the target. This is implemented as a genetic algorithm.
 \end{itemize}
 
 The genetic algorithm maintains a population of candidate parameter sets and evolves them over many generations using selection, crossover, and mutation. Quality is measured by a fitness function that compares the generated texture against the target using several image statistics:
@@ -283,6 +301,7 @@ The genetic algorithm maintains a population of candidate parameter sets and evo
 
 The configurable controls (population size, mutation rate, crossover method, and selection method) let the optimizer's behaviour itself become an object of study.
 
+\clearpage
 \section{Performance and Scalability Considerations}
 
 \subsection{Runtime Challenges}
@@ -309,6 +328,35 @@ Several strategies keep the application responsive:
     \item The fitness function relies on statistical rather than perceptual similarity measures.
 \end{itemize}
 
+\subsection{Texture Reuse and Caching Strategy}
+
+Without reuse, every object and every terrain chunk could trigger a seperate texture or material creation, which becomes expensive when many objects share visually similar materials. The prototype reduces this cost with two complementary caches. Materials are keyed by their full parameter set (algorithm, scale, octaves, colors, seed, variance, roughness, and so on). When an identical key is requested, the existing material is returned instead of building a new one. Terrain chunk geometries are cached analogously by chunk coordinates, world seed, and resolution, which avoids rebuilding geometry when the player revisits a chunk. Both caches are bounded (materials to 500 entries, geometries to 200) and evict the oldest entry when full.
+
+Variation is still preserved through a configurable texture-reuse rate. At a rate of one, every object receives a unique seed. At higher rates the seed is quantised so that groups of objects deliberately share the same texture. This exposes the trade-off between visual variety and generation cost directly as a measurable parameter in the evaluation.
+
+\begin{table}[H]
+    \centering
+    \caption{Caching Layers}
+    \label{tab:caching-layers}
+    \begin{tabularx}{\textwidth}{|X|X|X|X|}
+    \hline
+    \textbf{Cache} & \textbf{Key} & \textbf{Bound} & \textbf{Purpose} \\
+    \hline
+    \hline
+    
+    Material cache & algorithm + parameters + seed + roughness & 500 entries & Avoid rebuilding identical materials \\
+    \hline
+
+    Terrain geometry cache & chunkX, chunkZ, worldSeed, segments & 200 entries & Avoid recomputing revisited chunks \\
+    \hline
+
+    Texture-reuse rate & quantised object seed & - & Trade visual variety vs. generation cost \\
+    \hline
+    
+    \end{tabularx}
+\end{table}
+
+\clearpage
 \section{Experimental and Evaluation Infrastructure}
 
 A core contribution of the prototype is that evaluation is built into the application itself, so that measurements are gathered under the exact conditions being studied.
@@ -319,7 +367,7 @@ A core contribution of the prototype is that evaluation is built into the applic
 The prototype measures performance in both modules:
 
 \begin{itemize}
-    \item In the \textbf{Texture Synthesis Lab}, each generation is timed and recorded, and the panel reports the last, average, minimum, and maximum generation time. Example-based methods additionally display their total synthesis time and a real-time-feasability indicator.
+    \item In the \textbf{Texture Synthesis Lab}, each generation is timed and recorded, and the panel reports the last, average, minimum, and maximum generation time. Example-based methods additionally display their total synthesis time and a real-time-feasibility indicator.
     \item In the \textbf{Terrain Explorer}, a recording session (60 seconds by default) continuously samples frames per second, render time, texture generation time, and chunk generation time, while live graphs visualize the data.
 \end{itemize}
 
@@ -330,6 +378,7 @@ The prototype measures performance in both modules:
     \label{fig:live-graphs}
 \end{figure}
 
+\clearpage
 \subsection{Evaluation Metrics and Comparison Criteria}
 
 The metrics collected map directly onto the research questions, which compare methods by visual quality, runtime performance, reproducibility, and controllability:
