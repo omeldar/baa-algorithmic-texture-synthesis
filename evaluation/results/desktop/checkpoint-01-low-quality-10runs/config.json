@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "name": "low-quality",
+  "timestamp": "2026-06-01T13:29:13.032Z",
+  "worldSeed": 12345,
+  "viewDistance": 2,
+  "terrainQuality": 16,
+  "textureReuseRate": 5,
+  "showSky": true,
+  "cameraHeight": 50,
+  "cameraDistance": 60,
+  "cameraAzimuth": 0,
+  "cameraPolar": 1.0471975511965976,
+  "terrain": {
+    "color": "#4a7c59",
+    "algorithm": "none",
+    "scale": 8
+  },
+  "objects": {
+    "tree": [
+      {
+        "id": "trunk",
+        "name": "Trunk",
+        "color": "#7c4b2a",
+        "variance": 0.3,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      },
+      {
+        "id": "leaves",
+        "name": "Leaves",
+        "color": "#2d6a2d",
+        "variance": 0.4,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      }
+    ],
+    "pine": [
+      {
+        "id": "trunk",
+        "name": "Trunk",
+        "color": "#6b3d1e",
+        "variance": 0.3,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      },
+      {
+        "id": "leaves",
+        "name": "Leaves",
+        "color": "#1a4d1a",
+        "variance": 0.4,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      }
+    ],
+    "rock": [
+      {
+        "id": "rock",
+        "name": "Rock",
+        "color": "#7a7a7a",
+        "variance": 0.35,
+        "algorithm": "none",
+        "textureScale": 8,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      },
+      {
+        "id": "dark",
+        "name": "Shadow",
+        "color": "#555562",
+        "variance": 0.3,
+        "algorithm": "none",
+        "textureScale": 8,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      }
+    ],
+    "cactus": [
+      {
+        "id": "body",
+        "name": "Body",
+        "color": "#3a7d44",
+        "variance": 0.25,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      },
+      {
+        "id": "spine",
+        "name": "Spines",
+        "color": "#c8b560",
+        "variance": 0.2,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      }
+    ],
+    "bush": [
+      {
+        "id": "main",
+        "name": "Main",
+        "color": "#3d6b2a",
+        "variance": 0.4,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      },
+      {
+        "id": "accent",
+        "name": "Accent",
+        "color": "#2a5020",
+        "variance": 0.4,
+        "algorithm": "none",
+        "textureScale": 6,
+        "textureParams": {
+          "scale": 8,
+          "octaves": 4,
+          "persistence": 0.5,
+          "lacunarity": 2,
+          "anisotropy": 0.3,
+          "warpStrength": 0.8,
+          "warpScale": 2,
+          "ridgeStrength": 0.4,
+          "detailStrength": 0.15,
+          "crackStrength": 0.1,
+          "crackScale": 6,
+          "contrast": 1.2,
+          "brightness": 0,
+          "colorLight": "#d4a574",
+          "colorDark": "#4a3728"
+        }
+      }
+    ]
+  }
+}

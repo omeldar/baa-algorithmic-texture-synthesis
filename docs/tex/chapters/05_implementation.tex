@@ -415,6 +415,46 @@ The metrics collected map directly onto the research questions, which compare me
 
 Reproducibility is enforced through a shared seeded random-number generator used by terrain, object placement, and texture generation alike. Given the same seed and parameters, the prototype reproduces an identical world and identical textures. To support controlled experiments, complete environment configurations can be saved and reloaded, and all summary reports (PDF) and raw, self-documenting timing data (CSV) can be exported for external analysis. This allows each experiment to be repeated exactly and the resulting data to be examined independently of the application.
 
+Building on these saved configurations, the prototype additionally automates the repeated execution of experiments, so that statistically meaningful measurements can be gathered without manual supervision, as described in the following section.
+
+\subsection{Automated Batch Execution and Experiment Queuing}
+
+A single recording captures only one 60-second sample of one configuration. This is not enough for a reliable evaluation, because runtime metrics like frame rate and generation time are affected by measurement noise from browser scheduling and GPU behaviour. In addition, the research questions require the same metrics across several different configurations to compare them with each other. Doing this by hand is slow and error-prone, so two levels of automation were added: repeating one configuration (batch runs) and running many configurations after each other (experiment queuing).
+
+A batch executes the same frozen configuration several times in a row (one, five, or ten runs). Between the runs the environment is reset deterministically from the stored seed, so every run starts from the same state. This turns a single observation into a small distribution and gives an estimate of the measurement variance. The queue extends this idea to many configurations: each uploaded configuration is applied to the environment, given a short moment to settle, and then recorded as a full batch, before the queue automatically continues with the next one. Because such a series can easily take more than an hour, it can be started once and left running unattended.
+
+Long unattended runs introduced one reliability problem. The first version kept the per-frame samples of every run in memory until the whole queue had finished, which made the data grow without bound and eventually crashed the browser tab before any result could be saved. The solution is \textit{checkpointing}, which works as follows:
+
+\begin{enumerate}
+    \item when a configuration finishes, its complete results are exported immediately as one self-contained archive,
+    \item afterwards the heavy per-frame samples of that configuration are released, and only a small numeric summary stays in memory,
+    \item at the end, all summaries are combined into one comparison index that shows the averaged metrics of every configuration next to each other.
+\end{enumerate}
+
+This keeps the memory usage bounded by a single configuration instead of the whole queue, and it also makes sure that the results of every finished configuration are already saved. So even if the application crashes during a later configuration, the earlier ones are not lost.
+
+\begin{table}[H]
+    \centering
+    \caption{Levels of experiment automation}
+    \label{tab:automation-levels}
+    \begin{tabularx}{\textwidth}{|l|X|X|}
+    \hline
+    \textbf{Mechanism} & \textbf{Behaviour} & \textbf{Purpose} \\
+    \hline
+    \hline
+    
+    Batch run & Same configuration repeated N times with reset between runs & Repetition and measurement variance \\
+    \hline
+
+    Experiment queue & Several configurations recorded sequentially and unattended & Automated comparison across configurations \\
+    \hline
+
+    Checkpointing & Results exported per configuration, raw samples then released & Bounded memory and crash-resilient persistence \\
+    \hline
+    
+    \end{tabularx}
+\end{table}
+
 \section{Summary of the Implementation}
 
 The implemented prototype fulfills its role as a research instrument. It combines a deterministic procedural 3D environment, seven texture synthesis methods spanning procedural, rule-based, example-based, and optimization-based categories, and a built-in measurement and reporting system. GPU-based procedural methods provide instantaneous generation. Rule-based generation demonstrates structural pattern control, and the example-based and optimization methods make it possible to study how closely algorithmic textures can approximate a target. With reproducible seeding, configurable experiments, and exportable metrics, the prototype provides the controlled and measurable foundation required for the evaluation presented in the following chapter.
