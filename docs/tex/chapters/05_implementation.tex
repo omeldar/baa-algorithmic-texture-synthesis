@@ -124,6 +124,8 @@ interface TextureParameter {
 \clearpage
 \section{Procedural Environment Foundation}
 
+Before describing the procedural environment, it is important to clarify its role in this thesis. The terrain and scene composition are not the main research focus, but serve as a controlled testbed for evaluating texture synthesis methods under real-time conditions. This 3D environment provides a practical context in which generated textures can be applied, measured, and compared with respect to frame rate, scalability, and caching behaviour.
+
 \subsection{Terrain Generation}
 
 The 3D environment is an infinite, procedurally generated landscape. Terrain height is computed entirely from layered noise functions, with no stored height maps. Several noise layers are combined to produce believable geography:

@@ -377,7 +377,13 @@ Overall, the reproducibility test confirms that identical parameters lead to com
 
 \section{Visual Quality and Parameter Controllability}
 
-TBD
+Visual quality is more difficult to evaluate objectively than runtime performance. While frame rate and generation time can be measured directly, the quality of a generated texture depends on the intended material, the selected parameters, and visual judgement. Therefore, this section treats visual quality as a qualitative criterion rather than as a strict numerical result.
+
+The Wood texture model was used as the main example for parameter controllability. Its parameters influence visible properties such as grain scale, anisotropy, warping, contrast, brightness, detail strength, and crack structures. The exported examples in Appendix~\ref{appendix:wood-parameter-examples} show how changing individual parameters affects the generated texture.
+
+The practical goal of parameter controllability is to find settings that visually match a desired appearance. This can be done manually by adjusting parameters until the result is acceptable, or more systematically through optimization-based approximation. In both cases, the generated texture is not expected to exactly reproduce a target image, but to approximate its visual structure in a controllable way.
+
+Overall, the results show that the implemented procedural parameters provide meaningful visual control. However, the assessment remains qualitative, because no formal user study or perceptual image metric was used in this section.
 
 \section{Discussion}
 

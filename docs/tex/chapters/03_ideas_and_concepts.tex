@@ -53,19 +53,14 @@ The prototype developed in this thesis addresses these challenges through a simp
 
 The environment therefore serves as a practical testing context for investigating algorithmic texture synthesis approaches in scenarios relevant to modern procedural rendering applications.
 
+\clearpage
 \subsection{Purpose of the Research Prototype}
 
-The prototype is the central artifact of this thesis. Rather than studying texture synthesis methods only in isolation, it provides an interactive environment in which diffierent approaches can be implemented, parameterized, visualized, and compared under controlled and reproducible conditions.
+The prototype is the central artifact of this thesis and serves as a controlled environment for investigating algorithmic texture synthesis methods. Its purpose is not to justify the general usefulness of procedural textures, as this was already established in Section 1.3, but to define how the practical investigation is carried out.
 
-The prototype serves three roles:
+Conceptually, the prototype combines two connected views. The first view is a texture synthesis laboratory, where individual methods can be selected, parameterized, generated, and inspected. The second view is a terrain explorer, where the generated textures are applied to a simplified procedural 3D environment. This makes it possible to observe both the isolated texture output and its behavior in a real-time rendering context.
 
-\begin{itemize}
-    \item \textbf{A laboratory} for generating and inspecting individual textures with full parameter control.
-    \item \textbf{A real-time application} that embeds generated  textures in a procedurally created 3D world, demonstrating their behaviour under realistic runtime conditions.
-    \item \textbf{A measurement tool} that records objective performance and quality metrics and exports them for later analysis.
-\end{itemize}
-
-The prototype is therefore not a production renderer but a \textit{research instrument}. Its design prioritizes transparency, reproducibility, and measurability over visual perfection, so that the differences between synthesis methods can be observed and quantified directly.
+The prototype therefore acts as a research instrument with three main functions. It provides parameter control for testing different texture configurations, it offers a shared runtime environment for comparing synthesis methods under similar conditions, and it records evaluation data such as generation time, frame rate, and quality-related measurements. The design prioritizes transparency, reproducibility, and measurability rather than production-level visual quality.
 
 \begin{figure}[htbp]
     \centering
@@ -74,17 +69,11 @@ The prototype is therefore not a production renderer but a \textit{research inst
         \includegraphics[width=0.45\textwidth]{figures/03/baa-back-screen.png} \\[0.5em]
         (a) & (b)
     \end{tabular}
-    \caption{(a) shows the front page where parameters can be changed to generate textures, while (b) shows the terrain explorer with which we can test the feasability of using those algorithms in a 3D procedural real-time environment.}
+    \caption{(a) shows the texture synthesis laboratory, where parameters can be adjusted and generated textures can be inspected. (b) shows the terrain explorer, where generated textures are applied in a procedural real-time environment.}
     \label{fig:two-images}
 \end{figure}
 
-\subsection{Potential Applications and Benefits}
-
-Although the prototype is primarily designed for research purposes, the investigated concepts are also relevant for practical computer graphics applications. Procedural texture synthesis is widely used in areas such as procedural content generation, terrain rendering, video games, simulations, and interactive real-time graphics systems.
-
-The developed platform may therefore provide value for experimentation, education, and future research related to procedural rendering techniques. In addition, the prototype demonstrates how parameterized texture generation can reduce dependency on static texture assets while increasing scalability and variation in virtual environments.
-
-Another benefit of the prototype is its modular and controllable design, which allows different synthesis methods and parameter configurations to be tested under reproducible conditions. This supports comparative evaluation and may help identify strengths and limitations of different algorithmic approaches in practical rendering scenarios.
+Through this structure, the prototype supports the later implementation and evaluation chapters. It defines where texture methods are tested, how their parameters are controlled, and how comparable results are collected for the analysis.
 
 \clearpage
 \subsection{Requirements}
