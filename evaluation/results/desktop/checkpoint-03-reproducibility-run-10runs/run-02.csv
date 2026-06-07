@@ -1,0 +1,37 @@
+# Recording: reproducibility-run
+# Run: 2 of 10
+# Exported: 2026-06-07T02:06:20.693Z
+# Duration: 108.0 s
+# World Seed: 99999
+# View Distance: 3
+# Terrain Quality: 32 segments
+# Texture Reuse Rate: 3
+# Terrain Algorithm: none
+# Terrain Shader Seed: N/A
+# Camera Height: 50
+# Camera Distance: 60
+# Camera Azimuth: 0.0000 rad
+# Camera Polar: 1.0472 rad
+#
+# --- Summary (avg / min / max) ---
+# FPS: 0.0 / 0 / 0
+# Render ms: 0.000 / 0.000 / 0.000
+# TextureGen ms: 0.000 / 0.000 / 0.000
+# ChunkGen ms: 0.000 / 0.000 / 0.000
+# Total Textures Generated: 0
+# Total Chunks Generated: 1
+#
+# Object Slots:
+#   tree/0: algorithm=none seed=N/A
+#   tree/1: algorithm=none seed=N/A
+#   pine/0: algorithm=none seed=N/A
+#   pine/1: algorithm=none seed=N/A
+#   rock/0: algorithm=none seed=N/A
+#   rock/1: algorithm=none seed=N/A
+#   cactus/0: algorithm=none seed=N/A
+#   cactus/1: algorithm=none seed=N/A
+#   bush/0: algorithm=none seed=N/A
+#   bush/1: algorithm=none seed=N/A
+#
+Sample,FPS,FPS_Timestamp_ms,TextureGen_ms,TextureGen_Timestamp_ms,ChunkGen_ms,ChunkGen_Timestamp_ms,Render_ms,Render_Timestamp_ms
+0,,,,,0.000,382,,
