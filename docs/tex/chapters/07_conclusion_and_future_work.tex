@@ -1,1 +1,19 @@
-TBD
+\section{Conclusion and Future Work}
+
+This thesis investigated how algorithmic texture synthesis methods can be used in a procedural real-time environment. For this purpose, a custom research prototype was implemented that combines a texture synthesis laboratory with a procedurally generated 3D terrain environment. The prototype made it possible to generate textures, adjust parameters, apply the results to a real-time scene, and measure runtime behaviour under controlled conditions.
+
+The results show that procedural texture generation is especially suitable for the selected use case. Procedural methods can generate visually varied textures with relatively low runtime cost, which makes them practical for real-time applications. Rule-based methods also proved useful, especially for structured patterns such as cellular or crack-like textures. However, the evaluation also showed that the practical suitability depends strongly on the specific algorithm and its complexity. Therefore, the distinction between procedural and rule-based methods alone is not enough to predict performance or visual quality.
+
+The performance evaluation showed that the prototype can run interactively on suitable desktop hardware. Increasing scene complexity, view distance, or texture method complexity has a measurable impact on runtime performance, but the baseline configurations remained usable for interactive experimentation. On very weak laptop hardware, however, the more demanding configurations were not suitable for intensive real-time use. This confirms that browser-based procedural rendering is feasible, but still depends strongly on the available GPU performance.
+
+Optimization-based approximation was investigated as a separate aspect of the thesis. In contrast to direct texture generation, optimization is used to search for parameters that approximate a given target texture. This process is significantly slower and is therefore not directly comparable to real-time procedural generation. For this reason, the project focus shifted more strongly toward real-time applicability and runtime evaluation. Nevertheless, optimization remains relevant as an offline or pre-processing approach for estimating useful texture parameters.
+
+Overall, the prototype demonstrates that algorithmic texture synthesis can provide controllable variation for procedural real-time environments. It also shows that a custom research prototype is useful for comparing synthesis approaches under reproducible conditions. The work does not provide a production-ready material system, but it gives practical insight into the strengths and limitations of different algorithmic approaches.
+
+Future work should focus on extending the number and quality of available texture models. More material categories, such as stone, soil, bark, fabric, or metal, would allow a broader comparison of algorithmic texture synthesis methods. In addition, more advanced rule-based models could be added to better evaluate structured and semi-structured textures.
+
+Another important direction is the improvement of visual quality metrics. The current evaluation relies strongly on runtime measurements and visual inspection. Future work could include more objective image similarity metrics, perceptual comparison methods, or user studies. This would make it easier to evaluate not only how fast a method is, but also how convincing and useful the generated texture is.
+
+Further work could also improve optimization-based approximation. More efficient search strategies, better similarity metrics, and method-specific parameter spaces could make target texture approximation more useful. Since optimization is not real-time feasible in the current form, it would be most suitable as an offline process for generating presets that can later be used in the real-time environment.
+
+Finally, the prototype could be tested on a wider range of hardware and browser environments. This would make the performance conclusions more general and help identify which parts of the system are limited by the implementation, the browser, or the GPU hardware.

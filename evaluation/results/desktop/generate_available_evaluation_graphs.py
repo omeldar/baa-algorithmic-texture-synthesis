@@ -16,22 +16,27 @@ REQUIRED_COLUMNS = [
 
 
 def detect_config_type(folder_name: str) -> Optional[str]:
+    """
+    Detects the experiment type from the checkpoint folder name.
+    The order is important.
+    """
     name = folder_name.lower()
 
+    # Quality presets
     if "low-quality" in name:
         return "low-quality"
-    if "baseline" in name:
-        return "baseline"
     if "high-quality" in name:
         return "high-quality"
 
-    if "vd-1" in name:
+    # View distance tests
+    if re.search(r"(^|-)vd-1($|-)", name):
         return "vd-1"
-    if "vd-3" in name:
+    if re.search(r"(^|-)vd-3($|-)", name):
         return "vd-3"
-    if "vd-5" in name:
+    if re.search(r"(^|-)vd-5($|-)", name):
         return "vd-5"
 
+    # Texture reuse tests
     if "0-reuse" in name:
         return "0-reuse"
     if "25-reuse" in name:
@@ -39,6 +44,7 @@ def detect_config_type(folder_name: str) -> Optional[str]:
     if "50-reuse" in name:
         return "50-reuse"
 
+    # Synthesis methods
     if "perlin" in name:
         return "perlin"
     if "worley" in name:
@@ -48,14 +54,14 @@ def detect_config_type(folder_name: str) -> Optional[str]:
     if "wood" in name:
         return "wood"
 
+    # Baseline must be checked after method-specific configs.
+    if "baseline" in name:
+        return "baseline"
+
     return None
 
 
 def extract_summary_value(csv_path: Path, label: str):
-    """
-    Extracts values from metadata lines such as:
-    # Total Textures Generated: 42
-    """
     pattern = re.compile(rf"^#\s*{re.escape(label)}:\s*(.+)$")
 
     with csv_path.open("r", encoding="utf-8") as file:
@@ -72,9 +78,6 @@ def extract_summary_value(csv_path: Path, label: str):
 
 
 def read_measurement_csv(csv_path: Path) -> pd.DataFrame:
-    """
-    Reads one run CSV and ignores metadata/comment lines starting with '#'.
-    """
     df = pd.read_csv(csv_path, comment="#")
 
     missing_columns = [column for column in REQUIRED_COLUMNS if column not in df.columns]
@@ -120,23 +123,27 @@ def collect_all_runs(data_root: Path) -> pd.DataFrame:
             f"Run this script from the folder that contains the checkpoint-* folders."
         )
 
+    print("Detected checkpoint folders:")
+
     for folder in sorted(checkpoint_folders):
         config_type = detect_config_type(folder.name)
 
         if config_type is None:
-            print(f"Skipping unknown folder: {folder.name}")
+            print(f"  - {folder.name}: skipped, unknown config type")
             continue
+
+        print(f"  - {folder.name}: {config_type}")
 
         csv_files = sorted(folder.glob("run-*.csv"))
 
         if not csv_files:
-            print(f"Skipping {folder.name}: no run-*.csv files found.")
+            print(f"    skipped: no run-*.csv files found")
             continue
 
         if len(csv_files) != 10:
             print(
-                f"Warning: expected 10 run CSV files in {folder.name}, "
-                f"but found {len(csv_files)}."
+                f"    warning: expected 10 run CSV files, "
+                f"but found {len(csv_files)}"
             )
 
         for csv_path in csv_files:
@@ -179,12 +186,30 @@ def aggregate_by_config(runs_df: pd.DataFrame) -> pd.DataFrame:
 
 def select_configs(summary_df: pd.DataFrame, ordered_configs: list[str]) -> pd.DataFrame:
     selected = summary_df[summary_df["config_type"].isin(ordered_configs)].copy()
+
+    if selected.empty:
+        return selected
+
     selected["order"] = selected["config_type"].apply(ordered_configs.index)
     selected = selected.sort_values("order").drop(columns=["order"])
+
     return selected
 
 
-def plot_quality_performance(summary_df: pd.DataFrame, output_path: Path):
+def save_table_for_section(df: pd.DataFrame, output_path: Path):
+    df.to_csv(output_path, index=False)
+    print(f"Saved table: {output_path}")
+
+
+def plot_quality_performance(summary_df: pd.DataFrame, output_dir: Path):
+    """
+    Chapter 6.3:
+    General procedural environment performance.
+
+    IMPORTANT:
+    Texture generation is intentionally not shown here.
+    This section only shows FPS, render time, and chunk generation time.
+    """
     ordered_configs = ["low-quality", "baseline", "high-quality"]
     labels = ["Low quality", "Baseline", "High quality"]
 
@@ -194,10 +219,16 @@ def plot_quality_performance(summary_df: pd.DataFrame, output_path: Path):
         print("Skipping Chapter 6.3 graph: not all quality configs are available.")
         return
 
+    save_table_for_section(
+        df,
+        output_dir / "chapter_6_3_quality_performance_table.csv",
+    )
+
     x = list(range(len(labels)))
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 8), constrained_layout=True)
 
+    # FPS comparison
     fps_metrics = [
         ("avg_fps_mean", "avg_fps_std", "Average FPS"),
         ("min_fps_mean", "min_fps_std", "Minimum FPS"),
@@ -225,16 +256,16 @@ def plot_quality_performance(summary_df: pd.DataFrame, output_path: Path):
     axes[0].legend()
     axes[0].grid(axis="y", alpha=0.3)
 
+    # Runtime comparison WITHOUT texture generation
     timing_metrics = [
         ("avg_render_ms_mean", "avg_render_ms_std", "Render time"),
-        ("avg_texture_gen_ms_mean", "avg_texture_gen_ms_std", "Texture generation"),
         ("avg_chunk_gen_ms_mean", "avg_chunk_gen_ms_std", "Chunk generation"),
     ]
 
-    bar_width = 0.25
+    bar_width = 0.35
 
     for index, (mean_col, std_col, label) in enumerate(timing_metrics):
-        positions = [value + (index - 1) * bar_width for value in x]
+        positions = [value + (index - 0.5) * bar_width for value in x]
         axes[1].bar(
             positions,
             df[mean_col],
@@ -253,19 +284,29 @@ def plot_quality_performance(summary_df: pd.DataFrame, output_path: Path):
     axes[1].legend()
     axes[1].grid(axis="y", alpha=0.3)
 
+    output_path = output_dir / "chapter_6_3_quality_performance.png"
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
     print(f"Saved Chapter 6.3 graph: {output_path}")
 
 
-def plot_view_distance_scalability(summary_df: pd.DataFrame, output_path: Path):
+def plot_view_distance_scalability(summary_df: pd.DataFrame, output_dir: Path):
+    """
+    Chapter 6.4:
+    View distance scalability.
+    """
     ordered_configs = ["vd-1", "vd-3", "vd-5"]
     df = select_configs(summary_df, ordered_configs)
 
     if len(df) < 3:
         print("Skipping Chapter 6.4 graph: not all view-distance configs are available.")
         return
+
+    save_table_for_section(
+        df,
+        output_dir / "chapter_6_4_view_distance_scalability_table.csv",
+    )
 
     view_distances = [1, 3, 5]
 
@@ -312,14 +353,6 @@ def plot_view_distance_scalability(summary_df: pd.DataFrame, output_path: Path):
         capsize=4,
         label="Chunk generation",
     )
-    axes[1].errorbar(
-        view_distances,
-        df["avg_texture_gen_ms_mean"],
-        yerr=df["avg_texture_gen_ms_std"],
-        marker="o",
-        capsize=4,
-        label="Texture generation",
-    )
     axes[1].axhline(16.67, linestyle="--", linewidth=1, label="16.67 ms frame budget")
     axes[1].axhline(33.33, linestyle=":", linewidth=1, label="33.33 ms frame budget")
     axes[1].set_title("Runtime Costs by View Distance")
@@ -329,13 +362,18 @@ def plot_view_distance_scalability(summary_df: pd.DataFrame, output_path: Path):
     axes[1].legend()
     axes[1].grid(axis="y", alpha=0.3)
 
+    output_path = output_dir / "chapter_6_4_view_distance_scalability.png"
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
     print(f"Saved Chapter 6.4 graph: {output_path}")
 
 
-def plot_texture_reuse(summary_df: pd.DataFrame, output_path: Path):
+def plot_texture_reuse(summary_df: pd.DataFrame, output_dir: Path):
+    """
+    Chapter 6.5:
+    Texture reuse and caching evaluation.
+    """
     ordered_configs = ["0-reuse", "25-reuse", "50-reuse"]
     df = select_configs(summary_df, ordered_configs)
 
@@ -343,23 +381,27 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_path: Path):
         print("Skipping Chapter 6.5 graph: not enough reuse configs are available.")
         return
 
+    save_table_for_section(
+        df,
+        output_dir / "chapter_6_5_texture_reuse_table.csv",
+    )
+
     reuse_labels = {
-        "0-reuse": "0 / unique",
-        "25-reuse": "25",
-        "50-reuse": "50",
+        "0-reuse": "Unique / reuse 1",
+        "25-reuse": "Reuse 25",
+        "50-reuse": "Reuse 50",
     }
 
     labels = [reuse_labels[value] for value in df["config_type"].tolist()]
     x = list(range(len(labels)))
 
-    fig, axes = plt.subplots(2, 1, figsize=(10, 8), constrained_layout=True)
+    fig, axes = plt.subplots(3, 1, figsize=(10, 10), constrained_layout=True)
 
     axes[0].bar(
         x,
         df["avg_texture_gen_ms_mean"],
         yerr=df["avg_texture_gen_ms_std"],
         capsize=4,
-        label="Texture generation time",
     )
     axes[0].set_title("Texture Generation Cost by Reuse Configuration")
     axes[0].set_ylabel("Milliseconds")
@@ -367,9 +409,21 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_path: Path):
     axes[0].set_xticklabels(labels)
     axes[0].grid(axis="y", alpha=0.3)
 
+    axes[1].bar(
+        x,
+        df["total_textures_generated_mean"],
+        yerr=df["total_textures_generated_std"],
+        capsize=4,
+    )
+    axes[1].set_title("Generated Texture Count by Reuse Configuration")
+    axes[1].set_ylabel("Generated textures")
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels(labels)
+    axes[1].grid(axis="y", alpha=0.3)
+
     width = 0.35
 
-    axes[1].bar(
+    axes[2].bar(
         [value - width / 2 for value in x],
         df["avg_fps_mean"],
         width=width,
@@ -377,28 +431,38 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_path: Path):
         capsize=4,
         label="Average FPS",
     )
-    axes[1].bar(
+    axes[2].bar(
         [value + width / 2 for value in x],
-        df["total_textures_generated_mean"],
+        df["min_fps_mean"],
         width=width,
-        yerr=df["total_textures_generated_std"],
+        yerr=df["min_fps_std"],
         capsize=4,
-        label="Generated textures",
+        label="Minimum FPS",
     )
-    axes[1].set_title("Frame Rate and Generated Texture Count by Reuse Configuration")
-    axes[1].set_ylabel("FPS / texture count")
-    axes[1].set_xticks(x)
-    axes[1].set_xticklabels(labels)
-    axes[1].legend()
-    axes[1].grid(axis="y", alpha=0.3)
+    axes[2].axhline(60, linestyle="--", linewidth=1, label="60 FPS target")
+    axes[2].axhline(30, linestyle=":", linewidth=1, label="30 FPS lower boundary")
+    axes[2].set_title("Frame Rate by Reuse Configuration")
+    axes[2].set_ylabel("Frames per second")
+    axes[2].set_xticks(x)
+    axes[2].set_xticklabels(labels)
+    axes[2].legend()
+    axes[2].grid(axis="y", alpha=0.3)
 
+    output_path = output_dir / "chapter_6_5_texture_reuse.png"
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
     print(f"Saved Chapter 6.5 graph: {output_path}")
 
 
-def plot_method_comparison(summary_df: pd.DataFrame, output_path: Path):
+def plot_method_comparison(summary_df: pd.DataFrame, output_dir: Path):
+    """
+    Chapter 6.6:
+    Synthesis method comparison.
+
+    This will include Perlin automatically if a folder such as
+    checkpoint-02-perlin-10runs exists.
+    """
     possible_methods = ["baseline", "perlin", "worley", "simplex", "wood"]
     available_methods = [
         method for method in possible_methods
@@ -410,6 +474,11 @@ def plot_method_comparison(summary_df: pd.DataFrame, output_path: Path):
         return
 
     df = select_configs(summary_df, available_methods)
+
+    save_table_for_section(
+        df,
+        output_dir / "chapter_6_6_method_comparison_table.csv",
+    )
 
     label_map = {
         "baseline": "None / baseline",
@@ -463,6 +532,7 @@ def plot_method_comparison(summary_df: pd.DataFrame, output_path: Path):
     axes[1].legend()
     axes[1].grid(axis="y", alpha=0.3)
 
+    output_path = output_dir / "chapter_6_6_method_comparison.png"
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
 
@@ -500,29 +570,15 @@ def main():
     runs_df.to_csv(runs_csv, index=False)
     summary_df.to_csv(summary_csv, index=False)
 
+    print()
     print(f"Saved all run summaries to: {runs_csv}")
     print(f"Saved aggregated config summary to: {summary_csv}")
     print()
 
-    plot_quality_performance(
-        summary_df,
-        args.output_dir / "chapter_6_3_quality_performance.png",
-    )
-
-    plot_view_distance_scalability(
-        summary_df,
-        args.output_dir / "chapter_6_4_view_distance_scalability.png",
-    )
-
-    plot_texture_reuse(
-        summary_df,
-        args.output_dir / "chapter_6_5_texture_reuse.png",
-    )
-
-    plot_method_comparison(
-        summary_df,
-        args.output_dir / "chapter_6_6_method_comparison.png",
-    )
+    plot_quality_performance(summary_df, args.output_dir)
+    plot_view_distance_scalability(summary_df, args.output_dir)
+    plot_texture_reuse(summary_df, args.output_dir)
+    plot_method_comparison(summary_df, args.output_dir)
 
     print()
     print("Available aggregated results:")
