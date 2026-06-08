@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "name": "25-reuse",
-  "timestamp": "2026-06-01T17:26:53.645Z",
-  "worldSeed": 12345,
+  "name": "my-config",
+  "timestamp": "2026-06-07T22:15:54.217Z",
+  "worldSeed": 42,
   "viewDistance": 3,
   "terrainQuality": 24,
-  "textureReuseRate": 25,
+  "textureReuseRate": 1,
   "showSky": true,
   "cameraHeight": 50,
   "cameraDistance": 60,
@@ -23,7 +23,7 @@
         "name": "Trunk",
         "color": "#7c4b2a",
         "variance": 0.3,
-        "algorithm": "wood",
+        "algorithm": "none",
         "textureScale": 6,
         "textureParams": {
           "scale": 8,
@@ -75,7 +75,7 @@
         "name": "Trunk",
         "color": "#6b3d1e",
         "variance": 0.3,
-        "algorithm": "wood",
+        "algorithm": "none",
         "textureScale": 6,
         "textureParams": {
           "scale": 8,
@@ -127,7 +127,7 @@
         "name": "Rock",
         "color": "#7a7a7a",
         "variance": 0.35,
-        "algorithm": "perlin",
+        "algorithm": "none",
         "textureScale": 8,
         "textureParams": {
           "scale": 8,
@@ -231,7 +231,7 @@
         "name": "Main",
         "color": "#3d6b2a",
         "variance": 0.4,
-        "algorithm": "simplex",
+        "algorithm": "none",
         "textureScale": 6,
         "textureParams": {
           "scale": 8,

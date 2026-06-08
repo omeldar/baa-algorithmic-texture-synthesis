@@ -272,7 +272,22 @@ Overall, the prototype remains above the 30 FPS lower boundary in all tested vie
 
 \section{Texture Reuse and Caching Evaluation}
 
-TBD
+This section evaluates how texture reuse affects runtime behaviour in the Terrain Explorer. Three configurations were compared: unique texture generation with a reuse value of 1, a reuse value of 25, and a reuse value of 50. Each configuration was executed ten times and the exported CSV files were averaged.
+
+Figure~\ref{fig:texture-reuse} shows that higher texture reuse reduces the measured render time. The unique texture configuration has the highest average render time with approximately 217.09 ms. With reuse 25 this decreases to approximately 82.34 ms, and with reuse 50 it decreases further to approximately 61.44 ms. This indicates that reusing generated textures can noticeably reduce the rendering cost in the tested scene.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/06/chapter_6_5_texture_reuse.png}
+    \caption{Runtime behaviour for different texture reuse configurations. The graph compares render time, texture generation cost, and frame rate for unique textures, reuse 25, and reuse 50. Error bars indicate the standard deviation across ten repeated runs.}
+    \label{fig:texture-reuse}
+\end{figure}
+
+The texture generation cost also decreases slightly, from approximately 9.53 ms in the unique configuration to 7.15 ms with reuse 25 and 6.27 ms with reuse 50. The effect is smaller than for render time, but still shows that avoiding unnecessary texture variation can reduce generation overhead.
+
+The frame rate results show the same general trend. The average FPS remains high in all three configurations, but the minimum FPS improves strongly when reuse is enabled. In the unique configuration, the minimum FPS drops to approximately 22.9 FPS, while reuse 25 reaches approximately 75.0 FPS and reuse 50 reaches approximately 93.6 FPS. This suggests that texture reuse mainly improves stability and reduces heavy frame drops.
+
+Overall, the results show that texture reuse is beneficial for real-time use. A higher reuse value reduces runtime cost and improves frame-rate stability. The trade-off is that stronger reuse can reduce visual variation, because more objects may share the same generated texture.
 
 \section{Synthesis Method Comparison}
 \label{sec:synthesis_method_comparison}
@@ -338,6 +353,21 @@ This comparison shows that GPU-based synthesis methods can be integrated into th
 
 \section{Optimization-Based Approximation}
 
+Optimization-based approximation was evaluated separately from the real-time texture generation tests. While the previous sections focused on generating textures efficiently during rendering, this experiment investigates whether procedural parameters can be adjusted automatically to better approximate a given target texture. For this purpose, the Wood texture model was optimized against the same target image using several different optimization configurations. The corresponding target and result images are listed in Appendix~\ref{appendix:wood-optimization-results}.
+
+Figure~\ref{fig:wood-optimization-convergence} shows the convergence behaviour of the tested configurations. The graph plots the best similarity found so far over the optimization generations. Most configurations improve strongly during the early generations and then reach a plateau. This indicates that the optimizer is able to find useful Wood parameter combinations, but that additional iterations do not always lead to proportional improvements.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/06/wood_optimization_convergence_by_generation.png}
+    \caption{Convergence of the Wood optimization runs. The graph shows the best similarity found so far for each configuration over the optimization generations.}
+    \label{fig:wood-optimization-convergence}
+\end{figure}
+
+The best final results were achieved by the low-mutation and high-mutation configurations, with similarities of approximately 91.4\% and 91.2\%. The quality-256 configuration also reached a high similarity of 90.0\%, but with a larger output size. In contrast, the fast-preview, balanced, and high-search configurations remained around 86--87\%. This shows that more iterations or a larger population alone do not guarantee a better approximation. The mutation behaviour and the search dynamics of the optimizer have a strong influence on the final result.
+
+Overall, the results show that optimization-based approximation can improve the matching of procedural texture parameters to a target image. However, this process is not directly comparable to real-time texture generation, because it requires many candidate textures to be generated and evaluated. Therefore, optimization is better suited as an offline parameter search method. The resulting parameters can then be reused later in the real-time environment.
+
 \section{Reproducibility Evaluation}
 \label{sec:reproducibility_evaluation}
 
@@ -387,7 +417,17 @@ Overall, the results show that the implemented procedural parameters provide mea
 
 \section{Discussion}
 
-TBD
+The evaluation shows that algorithmic texture synthesis can be applied effectively in a procedural real-time environment, but its suitability depends strongly on the selected method and its complexity. The prototype allowed procedural, rule-based, and optimization-based approaches to be tested under controlled conditions and connected the generated textures to a real-time 3D scene.
+
+The first research question concerned existing approaches and systems for algorithmic texture synthesis. The state-of-the-art analysis showed that procedural, rule-based, example-based, and optimization-based methods each serve different purposes. Existing tools provide powerful workflows, but they are often designed for production rather than controlled measurement. Therefore, the custom prototype was useful because it allowed direct control over parameters, seeds, methods, and exported evaluation data.
+
+The second research question asked how procedural and rule-based methods can be implemented in a procedural real-time environment. The implementation shows that this is feasible by separating the Texture Synthesis Lab from the Terrain Explorer while using shared method definitions and parameters. GPU-based procedural methods such as Perlin, Simplex, and Wood are especially suitable for real-time use. Rule-based methods such as Worley can also be integrated, but the evaluation shows that runtime cost depends more on the concrete algorithm than on the category itself.
+
+The third research question focused on optimization-based approximation. The Wood optimization experiment showed that procedural parameters can be adjusted automatically to better approximate a target texture. The convergence results show clear improvement during the early generations, followed by a plateau. This means that optimization can help find useful parameter presets, but it is not suitable as a real-time generation method because many candidate textures must be generated and evaluated.
+
+The fourth research question compared the approaches with respect to visual quality, runtime performance, reproducibility, and controllability. Procedural methods achieved the best overall real-time suitability in the tested environment. Texture reuse and caching were also important, because they improved frame-rate stability and reduced repeated generation cost. The visual and parameter examples show that procedural parameters can create meaningful and understandable variation, although this part of the evaluation remains qualitative.
+
+Overall, the main research question can be answered positively within the scope of the prototype. Algorithmic texture synthesis can improve variation and controllability in procedural real-time environments, especially when efficient procedural methods are combined with reuse strategies. However, scalability is limited by rendering cost, hardware performance, and algorithm complexity. Optimization-based approximation is useful as an offline support method, but not as a direct real-time technique in the current implementation.
 
 \section{Evaluation Limitations}
 

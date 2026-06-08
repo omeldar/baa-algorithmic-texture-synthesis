@@ -37,12 +37,12 @@ def detect_config_type(folder_name: str) -> Optional[str]:
         return "vd-5"
 
     # Texture reuse tests
-    if "0-reuse" in name:
-        return "0-reuse"
-    if "25-reuse" in name:
-        return "25-reuse"
-    if "50-reuse" in name:
+    if re.search(r"(^|-)50-reuse($|-)", name):
         return "50-reuse"
+    if re.search(r"(^|-)25-reuse($|-)", name):
+        return "25-reuse"
+    if re.search(r"(^|-)0-reuse($|-)", name):
+        return "0-reuse"
 
     # Synthesis methods
     if "perlin" in name:
@@ -373,6 +373,9 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_dir: Path):
     """
     Chapter 6.5:
     Texture reuse and caching evaluation.
+
+    This version focuses on whether texture reuse improves runtime behavior:
+    render time, texture generation time, and frame rate.
     """
     ordered_configs = ["0-reuse", "25-reuse", "50-reuse"]
     df = select_configs(summary_df, ordered_configs)
@@ -397,30 +400,36 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_dir: Path):
 
     fig, axes = plt.subplots(3, 1, figsize=(10, 10), constrained_layout=True)
 
+    # Render time comparison
     axes[0].bar(
+        x,
+        df["avg_render_ms_mean"],
+        yerr=df["avg_render_ms_std"],
+        capsize=4,
+    )
+    axes[0].axhline(16.67, linestyle="--", linewidth=1, label="16.67 ms frame budget")
+    axes[0].axhline(33.33, linestyle=":", linewidth=1, label="33.33 ms frame budget")
+    axes[0].set_title("Render Time by Texture Reuse Configuration")
+    axes[0].set_ylabel("Milliseconds")
+    axes[0].set_xticks(x)
+    axes[0].set_xticklabels(labels)
+    axes[0].legend()
+    axes[0].grid(axis="y", alpha=0.3)
+
+    # Texture generation time comparison
+    axes[1].bar(
         x,
         df["avg_texture_gen_ms_mean"],
         yerr=df["avg_texture_gen_ms_std"],
         capsize=4,
     )
-    axes[0].set_title("Texture Generation Cost by Reuse Configuration")
-    axes[0].set_ylabel("Milliseconds")
-    axes[0].set_xticks(x)
-    axes[0].set_xticklabels(labels)
-    axes[0].grid(axis="y", alpha=0.3)
-
-    axes[1].bar(
-        x,
-        df["total_textures_generated_mean"],
-        yerr=df["total_textures_generated_std"],
-        capsize=4,
-    )
-    axes[1].set_title("Generated Texture Count by Reuse Configuration")
-    axes[1].set_ylabel("Generated textures")
+    axes[1].set_title("Texture Generation Cost by Reuse Configuration")
+    axes[1].set_ylabel("Milliseconds")
     axes[1].set_xticks(x)
     axes[1].set_xticklabels(labels)
     axes[1].grid(axis="y", alpha=0.3)
 
+    # Frame rate comparison
     width = 0.35
 
     axes[2].bar(
@@ -441,7 +450,7 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_dir: Path):
     )
     axes[2].axhline(60, linestyle="--", linewidth=1, label="60 FPS target")
     axes[2].axhline(30, linestyle=":", linewidth=1, label="30 FPS lower boundary")
-    axes[2].set_title("Frame Rate by Reuse Configuration")
+    axes[2].set_title("Frame Rate by Texture Reuse Configuration")
     axes[2].set_ylabel("Frames per second")
     axes[2].set_xticks(x)
     axes[2].set_xticklabels(labels)
@@ -453,7 +462,6 @@ def plot_texture_reuse(summary_df: pd.DataFrame, output_dir: Path):
     plt.close(fig)
 
     print(f"Saved Chapter 6.5 graph: {output_path}")
-
 
 def plot_method_comparison(summary_df: pd.DataFrame, output_dir: Path):
     """

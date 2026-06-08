@@ -152,3 +152,72 @@ The following figures show exported examples of the Wood texture model. For each
     \caption{Wood texture comparison for the warp strength parameter. Lower values keep the grain mostly regular, while higher values create stronger organic distortion.}
     \label{fig:wood-warp-strength}
 \end{figure}
+
+\subsection{Wood Optimization Results}
+\label{appendix:wood-optimization-results}
+
+This appendix lists the target texture, optimization configurations, and generated Wood texture results used for the optimization-based approximation experiment in Section~6.7. All configurations optimize the Wood texture model against the same target image.
+
+\begin{table}[H]
+\centering
+\caption{Wood optimization configurations and final similarity values}
+\label{tab:wood_optimization_configs}
+\begin{tabularx}{\textwidth}{|X|X|X|X|X|X|}
+\hline
+\textbf{Configuration} & \textbf{Max iterations} & \textbf{Population size} & \textbf{Mutation rate} & \textbf{Output size} & \textbf{Similarity} \\
+\hline
+\hline
+Fast preview & $50$ & $10$ & $0.20$ & $128$ & $86.9\%$ \\
+\hline
+Balanced & $150$ & $15$ & $0.15$ & $128$ & $86.5\%$ \\
+\hline
+High search & $300$ & $25$ & $0.20$ & $128$ & $86.7\%$ \\
+\hline
+High mutation & $150$ & $15$ & $0.35$ & $128$ & $91.2\%$ \\
+\hline
+Low mutation & $150$ & $15$ & $0.05$ & $128$ & $91.4\%$ \\
+\hline
+Quality 256 & $150$ & $15$ & $0.15$ & $256$ & $90.0\%$ \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.40\textwidth]{figures/appendix/wood-optimization/target_wood.jpg}
+    \caption{Target wood texture used for all optimization-based approximation runs. The image was cropped from an Ostermann product image and is used as a reference texture for evaluation purposes \cite{ostermann_finsa_nogal_bali}.}
+    \label{fig:wood-optimization-target}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.45\textwidth]{figures/appendix/wood-optimization/wood-fast-preview.png} &
+        \includegraphics[width=0.45\textwidth]{figures/appendix/wood-optimization/wood-balanced.png} \\[0.5em]
+        Fast preview, 86.9\% & Balanced, 86.5\%
+    \end{tabular}
+    \caption{Wood optimization results for the fast-preview and balanced configurations.}
+    \label{fig:wood-optimization-fast-balanced}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.45\textwidth]{figures/appendix/wood-optimization/wood-high-search.png} &
+        \includegraphics[width=0.45\textwidth]{figures/appendix/wood-optimization/wood-high-mutation.png} \\[0.5em]
+        High search, 86.7\% & High mutation, 91.2\%
+    \end{tabular}
+    \caption{Wood optimization results for the high-search and high-mutation configurations.}
+    \label{fig:wood-optimization-search-mutation}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.45\textwidth]{figures/appendix/wood-optimization/wood-low-mutation.png} &
+        \includegraphics[width=0.45\textwidth]{figures/appendix/wood-optimization/wood-quality-256.png} \\[0.5em]
+        Low mutation, 91.4\% & Quality 256, 90.0\%
+    \end{tabular}
+    \caption{Wood optimization results for the low-mutation and higher-resolution configurations.}
+    \label{fig:wood-optimization-low-quality}
+\end{figure}

@@ -1,0 +1,7 @@
+config,label,max_iterations,population_size,mutation_rate,output_size,generations_completed,total_evaluations,runtime_s,initial_fitness,final_best_fitness,initial_similarity_percent,final_similarity_percent,improvement_percentage_points
+wood-fast-preview,Fast preview,50.0,10.0,0.2,128.0,50.0,500.0,16.289,0.817956,0.868825,81.79560000000001,86.8825,5.086899999999995
+wood-balanced,Balanced,150.0,15.0,0.15,128.0,150.0,2250.0,72.255,0.8413,0.865452,84.13000000000001,86.5452,2.415199999999995
+wood-high-search,High search,300.0,25.0,0.2,128.0,300.0,7500.0,231.473,0.845847,0.912175,84.5847,91.2175,6.632799999999994
+wood-high-mutation,High mutation,150.0,15.0,0.35,128.0,150.0,2250.0,71.866,0.841009,0.91205,84.1009,91.205,7.1041000000000025
+wood-low-mutation,Low mutation,150.0,15.0,0.05,128.0,150.0,2250.0,71.024,0.852005,0.913545,85.2005,91.3545,6.1540000000000035
+wood-quality-256,Quality 256,150.0,15.0,0.15,256.0,150.0,2250.0,78.454,0.842723,0.900307,84.2723,90.0307,5.758399999999996
