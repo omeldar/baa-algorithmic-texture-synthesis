@@ -1,26 +1,31 @@
 "use client"
 
-import { useWebGPUTexture } from "@/hooks/use-webgpu-texture"
+import { useWebGPUTexture, type GenerationTiming } from "@/hooks/use-webgpu-texture"
 import type { TextureType } from "@/lib/texture-types"
-import { AlertCircle, Cpu } from "lucide-react"
+import { AlertCircle, Cpu, Clock } from "lucide-react"
 import { forwardRef, useImperativeHandle } from "react"
 
 interface TextureCanvasProps {
   textureType: TextureType
   params: Record<string, number | boolean | string>
+  onTimingUpdate?: (timing: { lastMs: number | null, history: GenerationTiming[] }) => void
 }
 
 export interface TextureCanvasRef {
   exportTexture: () => Promise<Blob | null>
+  getGenerationHistory: () => GenerationTiming[]
+  clearHistory: () => void
 }
 
 export const TextureCanvas = forwardRef<TextureCanvasRef, TextureCanvasProps>(
-  function TextureCanvas({ textureType, params }, ref) {
-  const { canvasRef, isSupported, error, exportTexture } = useWebGPUTexture(textureType, params)
+  function TextureCanvas({ textureType, params, onTimingUpdate }, ref) {
+  const { canvasRef, isSupported, error, exportTexture, lastGenerationMs, generationHistory, clearHistory } = useWebGPUTexture(textureType, params)
 
   useImperativeHandle(ref, () => ({
-    exportTexture
-  }), [exportTexture])
+    exportTexture,
+    getGenerationHistory: () => generationHistory,
+    clearHistory,
+  }), [exportTexture, generationHistory, clearHistory])
 
   if (!isSupported) {
     return (
@@ -89,10 +94,18 @@ export const TextureCanvas = forwardRef<TextureCanvasRef, TextureCanvasProps>(
           className="h-full w-full"
         />
         
-        {/* WebGPU badge */}
-        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-md bg-background/80 px-2 py-1 text-xs backdrop-blur">
-          <Cpu className="h-3 w-3 text-primary" />
-          <span className="text-muted-foreground">WebGPU</span>
+        {/* WebGPU badge + timing */}
+        <div className="absolute bottom-3 right-3 flex items-center gap-3">
+          {lastGenerationMs !== null && (
+            <div className="flex items-center gap-1.5 rounded-md bg-background/80 px-2 py-1 text-xs backdrop-blur">
+              <Clock className="h-3 w-3 text-green-500" />
+              <span className="text-muted-foreground tabular-nums">{lastGenerationMs.toFixed(2)} ms</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1.5 rounded-md bg-background/80 px-2 py-1 text-xs backdrop-blur">
+            <Cpu className="h-3 w-3 text-primary" />
+            <span className="text-muted-foreground">WebGPU</span>
+          </div>
         </div>
       </div>
     </div>

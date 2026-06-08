@@ -3,6 +3,24 @@
  * Efros-Freeman (SIGGRAPH 2001) patch-based texture synthesis.
  */
 
+// Seeded random number generator for reproducibility
+let rngState = 42
+function seedRandom(seed) {
+  // Hash the seed string to a number
+  let hash = 0
+  const str = String(seed)
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  rngState = Math.abs(hash) || 42
+}
+
+function seededRandom() {
+  rngState = (rngState * 1103515245 + 12345) & 0x7fffffff
+  return rngState / 0x7fffffff
+}
+
 // Get pixel value at (x, y)
 function getPixel(data, width, x, y) {
   const idx = (y * width + x) * 4
@@ -91,6 +109,12 @@ function findMinCut(patch, patchSize, output, outputWidth, outX, outY, overlapX,
         const patchIdx = (y * patchSize + x) * 4
         const outIdx = ((outY + y) * outputWidth + (outX + x)) * 4
         
+        // Bounds check for output array
+        if (outIdx < 0 || outIdx + 2 >= output.length) {
+          errors[y][x] = 0
+          continue
+        }
+        
         const dr = patch[patchIdx] - output[outIdx]
         const dg = patch[patchIdx + 1] - output[outIdx + 1]
         const db = patch[patchIdx + 2] - output[outIdx + 2]
@@ -102,26 +126,27 @@ function findMinCut(patch, patchSize, output, outputWidth, outX, outY, overlapX,
     const cumError = Array(patchSize).fill(null).map(() => Array(overlapX).fill(0))
     
     for (let x = 0; x < overlapX; x++) {
-      cumError[0][x] = errors[0][x]
+      cumError[0][x] = errors[0][x] || 0
     }
     
     for (let y = 1; y < patchSize; y++) {
       for (let x = 0; x < overlapX; x++) {
-        const left = x > 0 ? cumError[y - 1][x - 1] : Infinity
-        const up = cumError[y - 1][x]
-        const right = x < overlapX - 1 ? cumError[y - 1][x + 1] : Infinity
+        const left = x > 0 ? (cumError[y - 1][x - 1] || 0) : Infinity
+        const up = cumError[y - 1][x] || 0
+        const right = x < overlapX - 1 ? (cumError[y - 1][x + 1] || 0) : Infinity
         
-        cumError[y][x] = errors[y][x] + Math.min(left, up, right)
+        cumError[y][x] = (errors[y][x] || 0) + Math.min(left, up, right)
       }
     }
     
     const seam = Array(patchSize)
     
     let minX = 0
-    let minVal = cumError[patchSize - 1][0]
+    let minVal = cumError[patchSize - 1][0] || Infinity
     for (let x = 1; x < overlapX; x++) {
-      if (cumError[patchSize - 1][x] < minVal) {
-        minVal = cumError[patchSize - 1][x]
+      const val = cumError[patchSize - 1][x] || Infinity
+      if (val < minVal) {
+        minVal = val
         minX = x
       }
     }
@@ -129,14 +154,17 @@ function findMinCut(patch, patchSize, output, outputWidth, outX, outY, overlapX,
     
     for (let y = patchSize - 2; y >= 0; y--) {
       const x = seam[y + 1]
-      const left = x > 0 ? cumError[y][x - 1] : Infinity
-      const up = cumError[y][x]
-      const right = x < overlapX - 1 ? cumError[y][x + 1] : Infinity
+      const left = x > 0 ? (cumError[y][x - 1] || Infinity) : Infinity
+      const up = cumError[y][x] || Infinity
+      const right = x < overlapX - 1 ? (cumError[y][x + 1] || Infinity) : Infinity
       
       const minErr = Math.min(left, up, right)
       if (minErr === left) seam[y] = x - 1
       else if (minErr === up) seam[y] = x
       else seam[y] = x + 1
+      
+      // Clamp seam to valid range
+      seam[y] = Math.max(0, Math.min(overlapX - 1, seam[y]))
     }
     
     for (let y = 0; y < patchSize; y++) {
@@ -155,6 +183,12 @@ function findMinCut(patch, patchSize, output, outputWidth, outX, outY, overlapX,
         const patchIdx = (y * patchSize + x) * 4
         const outIdx = ((outY + y) * outputWidth + (outX + x)) * 4
         
+        // Bounds check for output array
+        if (outIdx < 0 || outIdx + 2 >= output.length) {
+          errors[y][x] = 0
+          continue
+        }
+        
         const dr = patch[patchIdx] - output[outIdx]
         const dg = patch[patchIdx + 1] - output[outIdx + 1]
         const db = patch[patchIdx + 2] - output[outIdx + 2]
@@ -165,41 +199,48 @@ function findMinCut(patch, patchSize, output, outputWidth, outX, outY, overlapX,
     
     const cumError = Array(overlapY).fill(null).map(() => Array(patchSize).fill(0))
     
+    // Initialize first column
     for (let y = 0; y < overlapY; y++) {
-      cumError[y][0] = errors[y][0]
+      cumError[y][0] = errors[y][0] || 0
     }
     
+    // Fill cumulative error from left to right
     for (let x = 1; x < patchSize; x++) {
       for (let y = 0; y < overlapY; y++) {
-        const top = y > 0 ? cumError[y - 1][x - 1] : Infinity
-        const left = cumError[y][x - 1]
-        const bottom = y < overlapY - 1 ? cumError[y + 1][x - 1] : Infinity
+        const top = y > 0 ? (cumError[y - 1][x - 1] || 0) : Infinity
+        const left = cumError[y][x - 1] || 0
+        const bottom = y < overlapY - 1 ? (cumError[y + 1][x - 1] || 0) : Infinity
         
-        cumError[y][x] = errors[y][x] + Math.min(top, left, bottom)
+        cumError[y][x] = (errors[y][x] || 0) + Math.min(top, left, bottom)
       }
     }
     
     const seam = Array(patchSize)
     let minY = 0
-    let minVal = cumError[0][patchSize - 1]
+    let minVal = cumError[0][patchSize - 1] || Infinity
     for (let y = 1; y < overlapY; y++) {
-      if (cumError[y][patchSize - 1] < minVal) {
-        minVal = cumError[y][patchSize - 1]
+      const val = cumError[y][patchSize - 1] || Infinity
+      if (val < minVal) {
+        minVal = val
         minY = y
       }
     }
     seam[patchSize - 1] = minY
     
+    // Trace back seam from right to left
     for (let x = patchSize - 2; x >= 0; x--) {
       const y = seam[x + 1]
-      const top = y > 0 ? cumError[y - 1][x] : Infinity
-      const left = cumError[y][x]
-      const bottom = y < overlapY - 1 ? cumError[y + 1][x] : Infinity
+      const top = y > 0 ? (cumError[y - 1][x] || Infinity) : Infinity
+      const left = cumError[y][x] || Infinity
+      const bottom = y < overlapY - 1 ? (cumError[y + 1][x] || Infinity) : Infinity
       
       const minErr = Math.min(top, left, bottom)
       if (minErr === top) seam[x] = y - 1
       else if (minErr === left) seam[x] = y
       else seam[x] = y + 1
+      
+      // Clamp seam to valid range
+      seam[x] = Math.max(0, Math.min(overlapY - 1, seam[x]))
     }
     
     for (let x = 0; x < patchSize; x++) {
@@ -256,12 +297,12 @@ function findBestPatch(sourceData, sourceWidth, sourceHeight, output, outputWidt
   }
   
   if (candidates.length > 0) {
-    const idx = Math.floor(Math.random() * Math.min(candidates.length, 5))
+    const idx = Math.floor(seededRandom() * Math.min(candidates.length, 5))
     return candidates[idx].patch
   }
   
-  const rx = Math.floor(Math.random() * (sourceWidth - patchSize))
-  const ry = Math.floor(Math.random() * (sourceHeight - patchSize))
+  const rx = Math.floor(seededRandom() * (sourceWidth - patchSize))
+  const ry = Math.floor(seededRandom() * (sourceHeight - patchSize))
   return extractPatch(sourceData, sourceWidth, sourceHeight, rx, ry, patchSize)
 }
 
@@ -338,6 +379,9 @@ function quilt(sourceData, outputWidth, outputHeight, patchSize, overlapSize, er
 self.onmessage = function(e) {
   if (e.data.type === 'start') {
     try {
+      // Initialize seeded random for reproducibility
+      seedRandom(e.data.seed || "42")
+      
       if (!e.data.sourceData || !e.data.sourceData.data || !e.data.sourceData.width || !e.data.sourceData.height) {
         throw new Error('Invalid source data: missing data, width, or height')
       }

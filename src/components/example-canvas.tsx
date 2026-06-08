@@ -3,8 +3,10 @@
 import { useState, useRef, useCallback, forwardRef, useImperativeHandle, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Upload, Play, AlertCircle, Square } from "lucide-react"
+import { Upload, Play, AlertCircle, Square, FileText, Clock } from "lucide-react"
 import { toast } from "sonner"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 // Maximum dimensions to prevent long processing times
 const MAX_INPUT_SIZE = 128
@@ -13,6 +15,15 @@ import type { TextureType } from "@/lib/texture-types"
 
 export interface ExampleCanvasRef {
   exportTexture: () => Promise<Blob | null>
+  getLastGenerationTime: () => number | null
+}
+
+interface GenerationRecord {
+  timestamp: number
+  generationMs: number
+  outputWidth: number
+  outputHeight: number
+  params: Record<string, number | string>
 }
 
 interface ExampleCanvasProps {
@@ -59,6 +70,7 @@ export const ExampleCanvas = forwardRef<ExampleCanvasRef, ExampleCanvasProps>(
     const [progress, setProgress] = useState(0)
     const [elapsedTime, setElapsedTime] = useState<number | null>(null)
     const [intermediateResult, setIntermediateResult] = useState<string | null>(null)
+    const [generationHistory, setGenerationHistory] = useState<GenerationRecord[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
     const workerRef = useRef<Worker | null>(null)
     const startTimeRef = useRef<number>(0)
@@ -66,16 +78,18 @@ export const ExampleCanvas = forwardRef<ExampleCanvasRef, ExampleCanvasProps>(
     // Determine which algorithm we're using
     const isImageQuilting = textureType === "image-quilting"
     
-    // Extract params based on algorithm
-    // Efros-Leung params
-    const neighborhoodSize = Number(params.neighborhoodSize) || 5
-    // Image Quilting params  
-    const patchSize = Number(params.patchSize) || 32
-    const overlapSize = Number(params.overlapSize) || 8
-    // Common params
-    const outputWidth = Number(params.outputWidth) || (isImageQuilting ? 256 : 128)
-    const outputHeight = Number(params.outputHeight) || (isImageQuilting ? 256 : 128)
-    const errorTolerance = Number(params.errorTolerance) || 0.1
+  // Extract params based on algorithm
+  // Common params
+  const seed = String(params.seed || "42")
+  // Efros-Leung params
+  const neighborhoodSize = Number(params.neighborhoodSize) || 5
+  // Image Quilting params
+  const patchSize = Number(params.patchSize) || 32
+  const overlapSize = Number(params.overlapSize) || 8
+  // Common params
+  const outputWidth = Number(params.outputWidth) || (isImageQuilting ? 256 : 128)
+  const outputHeight = Number(params.outputHeight) || (isImageQuilting ? 256 : 128)
+  const errorTolerance = Number(params.errorTolerance) || 0.1
 
     // Cleanup worker on unmount
     useEffect(() => {
@@ -91,7 +105,8 @@ export const ExampleCanvas = forwardRef<ExampleCanvasRef, ExampleCanvasProps>(
         if (!resultImage) return null
         const response = await fetch(resultImage)
         return response.blob()
-      }
+      },
+      getLastGenerationTime: () => elapsedTime,
     }))
 
     const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,6 +230,18 @@ export const ExampleCanvas = forwardRef<ExampleCanvasRef, ExampleCanvasProps>(
             setElapsedTime(elapsed)
             setIsProcessing(false)
             
+            // Record to history
+            const record: GenerationRecord = {
+              timestamp: Date.now(),
+              generationMs: elapsed,
+              outputWidth,
+              outputHeight,
+              params: isImageQuilting
+                ? { seed, patchSize, overlapSize, errorTolerance }
+                : { seed, neighborhoodSize, errorTolerance },
+            }
+            setGenerationHistory(prev => [...prev, record].slice(-20))
+            
             toast.success(`Synthesis complete in ${(elapsed / 1000).toFixed(1)}s`)
             
             worker.terminate()
@@ -245,32 +272,140 @@ export const ExampleCanvas = forwardRef<ExampleCanvasRef, ExampleCanvasProps>(
           height: sourceImage.height,
         }
         
-        if (isImageQuilting) {
-          worker.postMessage({
-            type: "start",
-            sourceData: sourceDataObj,
-            outputWidth: Math.min(outputWidth, 512),
-            outputHeight: Math.min(outputHeight, 512),
-            patchSize,
-            overlapSize,
-            errorTolerance,
-          })
-        } else {
-          worker.postMessage({
-            type: "start",
-            sourceData: sourceDataObj,
-            outputWidth: Math.min(outputWidth, 256),
-            outputHeight: Math.min(outputHeight, 256),
-            neighborhoodSize,
-            errorTolerance,
-          })
-        }
+      if (isImageQuilting) {
+        worker.postMessage({
+          type: "start",
+          seed,
+          sourceData: sourceDataObj,
+          outputWidth: Math.min(outputWidth, 512),
+          outputHeight: Math.min(outputHeight, 512),
+          patchSize,
+          overlapSize,
+          errorTolerance,
+        })
+      } else {
+        worker.postMessage({
+          type: "start",
+          seed,
+          sourceData: sourceDataObj,
+          outputWidth: Math.min(outputWidth, 256),
+          outputHeight: Math.min(outputHeight, 256),
+          neighborhoodSize,
+          errorTolerance,
+        })
+      }
       } catch (error) {
         console.error("Synthesis error:", error)
         toast.error("Failed to start synthesis")
         setIsProcessing(false)
       }
-    }, [sourceImage, isImageQuilting, neighborhoodSize, patchSize, overlapSize, outputWidth, outputHeight, errorTolerance])
+    }, [sourceImage, isImageQuilting, seed, neighborhoodSize, patchSize, overlapSize, outputWidth, outputHeight, errorTolerance])
+
+    // Calculate stats from history
+    const historyStats = generationHistory.length > 0 ? {
+      count: generationHistory.length,
+      avg: generationHistory.reduce((sum, r) => sum + r.generationMs, 0) / generationHistory.length,
+      min: Math.min(...generationHistory.map(r => r.generationMs)),
+      max: Math.max(...generationHistory.map(r => r.generationMs)),
+    } : null
+
+    const handleDownloadReport = useCallback(() => {
+      if (generationHistory.length === 0) {
+        toast.error("No generation history to export")
+        return
+      }
+
+      const methodName = isImageQuilting ? "Image Quilting" : "Efros-Leung"
+      const stats = historyStats!
+
+      // PDF Report
+      const pdf = new jsPDF()
+      pdf.setFontSize(18)
+      pdf.text(`${methodName} Generation Report`, 14, 20)
+      
+      pdf.setFontSize(10)
+      pdf.setTextColor(100)
+      pdf.text(`Generated: ${new Date().toLocaleString()}`, 14, 28)
+      pdf.text(`Method: ${methodName} (CPU-based, example-based synthesis)`, 14, 34)
+      pdf.text(`Samples: ${stats.count}`, 14, 40)
+
+      // Summary table
+      autoTable(pdf, {
+        startY: 48,
+        head: [["Metric", "Value"]],
+        body: [
+          ["Average Generation Time", `${(stats.avg / 1000).toFixed(2)} seconds`],
+          ["Minimum Generation Time", `${(stats.min / 1000).toFixed(2)} seconds`],
+          ["Maximum Generation Time", `${(stats.max / 1000).toFixed(2)} seconds`],
+          ["Total Samples", `${stats.count}`],
+          ["Real-time Feasible?", stats.avg < 16 ? "Yes" : "No (exceeds 16ms frame budget)"],
+        ],
+        theme: "striped",
+        headStyles: { fillColor: [60, 60, 60] },
+      })
+
+      // Parameters from last run
+      const lastRun = generationHistory[generationHistory.length - 1]
+      const paramEntries = Object.entries(lastRun.params).map(([key, val]) => [
+        key,
+        String(val)
+      ])
+      paramEntries.push(["outputWidth", String(lastRun.outputWidth)])
+      paramEntries.push(["outputHeight", String(lastRun.outputHeight)])
+      
+      autoTable(pdf, {
+        startY: (pdf as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
+        head: [["Parameter", "Value"]],
+        body: paramEntries,
+        theme: "striped",
+        headStyles: { fillColor: [60, 60, 60] },
+      })
+
+      // History table
+      const historyData = generationHistory.map((r, i) => [
+        String(i + 1),
+        `${(r.generationMs / 1000).toFixed(2)}s`,
+        `${r.outputWidth}x${r.outputHeight}`,
+        new Date(r.timestamp).toLocaleTimeString(),
+      ])
+
+      autoTable(pdf, {
+        startY: (pdf as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
+        head: [["#", "Gen Time", "Output Size", "Timestamp"]],
+        body: historyData,
+        theme: "striped",
+        headStyles: { fillColor: [60, 60, 60] },
+      })
+
+      pdf.save(`${methodName.toLowerCase().replace(" ", "-")}-report-${Date.now()}.pdf`)
+
+      // Also export CSV
+      const csvLines = [
+        `# ${methodName} Generation Report`,
+        `# Generated: ${new Date().toISOString()}`,
+        `# Avg: ${(stats.avg / 1000).toFixed(2)}s, Min: ${(stats.min / 1000).toFixed(2)}s, Max: ${(stats.max / 1000).toFixed(2)}s`,
+        `#`,
+        `# Last Run Parameters:`,
+        ...Object.entries(lastRun.params).map(([k, v]) => `# ${k}: ${v}`),
+        `# outputWidth: ${lastRun.outputWidth}`,
+        `# outputHeight: ${lastRun.outputHeight}`,
+        `#`,
+        `sample,generation_ms,generation_sec,output_width,output_height,timestamp`,
+        ...generationHistory.map((r, i) => 
+          `${i + 1},${r.generationMs},${(r.generationMs / 1000).toFixed(2)},${r.outputWidth},${r.outputHeight},${r.timestamp}`
+        ),
+      ]
+      
+      const csvBlob = new Blob([csvLines.join("\n")], { type: "text/csv" })
+      const csvUrl = URL.createObjectURL(csvBlob)
+      const csvLink = document.createElement("a")
+      csvLink.href = csvUrl
+      csvLink.download = `${methodName.toLowerCase().replace(" ", "-")}-data-${Date.now()}.csv`
+      csvLink.click()
+      URL.revokeObjectURL(csvUrl)
+
+      toast.success("Report downloaded (PDF + CSV)")
+    }, [generationHistory, historyStats, isImageQuilting])
 
     // Display image (intermediate or final)
     const displayResult = resultImage || intermediateResult
@@ -394,6 +529,70 @@ export const ExampleCanvas = forwardRef<ExampleCanvasRef, ExampleCanvasProps>(
               </Button>
             )}
           </div>
+
+          {/* Generation Metrics Panel */}
+          {(elapsedTime || historyStats) && (
+            <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                  Generation Metrics
+                </h3>
+                {historyStats && (
+                  <span className="text-xs text-muted-foreground">{historyStats.count} samples</span>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {elapsedTime && (
+                  <div className="rounded-md bg-muted/50 p-3">
+                    <p className="text-xs text-muted-foreground">Last Run</p>
+                    <p className="text-lg font-semibold tabular-nums">{(elapsedTime / 1000).toFixed(2)}s</p>
+                    <p className="text-xs text-muted-foreground">{elapsedTime.toFixed(0)} ms</p>
+                  </div>
+                )}
+                {historyStats && (
+                  <>
+                    <div className="rounded-md bg-muted/50 p-3">
+                      <p className="text-xs text-muted-foreground">Average</p>
+                      <p className="text-lg font-semibold tabular-nums">{(historyStats.avg / 1000).toFixed(2)}s</p>
+                      <p className="text-xs text-muted-foreground">{historyStats.avg.toFixed(0)} ms</p>
+                    </div>
+                    <div className="rounded-md bg-muted/50 p-3">
+                      <p className="text-xs text-muted-foreground">Min</p>
+                      <p className="text-lg font-semibold tabular-nums">{(historyStats.min / 1000).toFixed(2)}s</p>
+                    </div>
+                    <div className="rounded-md bg-muted/50 p-3">
+                      <p className="text-xs text-muted-foreground">Max</p>
+                      <p className="text-lg font-semibold tabular-nums">{(historyStats.max / 1000).toFixed(2)}s</p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Real-time feasibility indicator */}
+              {historyStats && (
+                <div className={`rounded-md p-3 text-sm ${historyStats.avg < 16 ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'}`}>
+                  {historyStats.avg < 16 
+                    ? "Real-time feasible (under 16ms frame budget)"
+                    : `Not real-time feasible: ${(historyStats.avg / 1000).toFixed(2)}s avg is ${Math.round(historyStats.avg / 16)}x slower than 16ms frame budget`
+                  }
+                </div>
+              )}
+
+              {historyStats && historyStats.count > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadReport}
+                  className="w-full"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Download Report (PDF + CSV)
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Algorithm info */}
           <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">

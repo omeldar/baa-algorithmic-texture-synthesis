@@ -4,6 +4,13 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import type { TextureType } from "@/lib/texture-types"
 import { generateShader } from "@/lib/shaders"
 
+export interface GenerationTiming {
+  timestamp: number
+  generationMs: number
+  textureType: TextureType
+  params: Record<string, number | boolean | string>
+}
+
 export function useWebGPUTexture(
   textureType: TextureType,
   params: Record<string, number | boolean | string>
@@ -11,6 +18,8 @@ export function useWebGPUTexture(
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isSupported, setIsSupported] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastGenerationMs, setLastGenerationMs] = useState<number | null>(null)
+  const [generationHistory, setGenerationHistory] = useState<GenerationTiming[]>([])
   const deviceRef = useRef<GPUDevice | null>(null)
   const contextRef = useRef<GPUCanvasContext | null>(null)
   const animationRef = useRef<number>(0)
@@ -58,6 +67,7 @@ export function useWebGPUTexture(
       const context = contextRef.current
       if (!device || !context) return
 
+      const genStart = performance.now()
       const time = (Date.now() - startTimeRef.current) / 1000
       const shaderCode = generateShader(textureType, params, time)
 
@@ -98,6 +108,26 @@ export function useWebGPUTexture(
       renderPass.end()
 
       device.queue.submit([commandEncoder.finish()])
+      
+      // Measure generation time
+      const genEnd = performance.now()
+      const generationMs = genEnd - genStart
+      setLastGenerationMs(generationMs)
+      
+      // Only record to history if not animating (to avoid flooding)
+      if (!params.animate) {
+        setGenerationHistory(prev => {
+          const newEntry: GenerationTiming = {
+            timestamp: Date.now(),
+            generationMs,
+            textureType,
+            params: { ...params },
+          }
+          // Keep last 100 entries
+          const updated = [...prev, newEntry].slice(-100)
+          return updated
+        })
+      }
 
       // Continue animation if animate is enabled
       if (params.animate) {
@@ -238,5 +268,10 @@ export function useWebGPUTexture(
     }
   }, [textureType, params])
 
-  return { canvasRef, isSupported, error, exportTexture }
+  // Clear history
+  const clearHistory = useCallback(() => {
+    setGenerationHistory([])
+  }, [])
+
+  return { canvasRef, isSupported, error, exportTexture, lastGenerationMs, generationHistory, clearHistory }
 }

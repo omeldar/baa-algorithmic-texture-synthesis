@@ -7,8 +7,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type { TextureDefinition, TextureParameter } from "@/lib/texture-types"
-import { Code2, RotateCcw, Download } from "lucide-react"
+import { Code2, RotateCcw, Download, FileText, Clock, Trash2 } from "lucide-react"
+import type { GenerationTiming } from "@/hooks/use-webgpu-texture"
+
+// Options for the base algorithm select
+const BASE_ALGORITHM_OPTIONS = [
+  { value: "wood", label: "Wood" },
+  { value: "perlin", label: "Perlin Noise" },
+  { value: "simplex", label: "Simplex Noise" },
+  { value: "worley", label: "Worley Cracks" },
+]
 
 interface ParameterPanelProps {
   definition: TextureDefinition
@@ -18,6 +34,11 @@ interface ParameterPanelProps {
   onShowCode?: () => void
   onExport: () => void
   hideCodeButton?: boolean
+  // Metrics props
+  lastGenerationMs?: number | null
+  generationHistory?: GenerationTiming[]
+  onClearHistory?: () => void
+  onDownloadReport?: () => void
 }
 
 /**
@@ -105,6 +126,26 @@ function ParameterControl({
         </Field>
       )
 
+    case "select":
+      return (
+        <Field>
+          <FieldLabel className="text-sm">{param.label}</FieldLabel>
+          <Select value={String(value)} onValueChange={(v) => onChange(v)}>
+            <SelectTrigger className="mt-1.5 h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {BASE_ALGORITHM_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <ParameterDescription description={param.description} />
+        </Field>
+      )
+
     default:
       return null
   }
@@ -118,7 +159,19 @@ export function ParameterPanel({
   onShowCode,
   onExport,
   hideCodeButton = false,
+  lastGenerationMs,
+  generationHistory = [],
+  onClearHistory,
+  onDownloadReport,
 }: ParameterPanelProps) {
+  // Calculate stats from history
+  const historyStats = generationHistory.length > 0 ? {
+    count: generationHistory.length,
+    avg: generationHistory.reduce((sum, t) => sum + t.generationMs, 0) / generationHistory.length,
+    min: Math.min(...generationHistory.map(t => t.generationMs)),
+    max: Math.max(...generationHistory.map(t => t.generationMs)),
+  } : null
+
   return (
     <aside className="flex h-full max-h-screen w-80 flex-col border-l border-border bg-card">
       {/* Header - fixed at top */}
@@ -148,6 +201,62 @@ export function ParameterPanel({
           </div>
         </ScrollArea>
       </div>
+
+      {/* Metrics section - only show for GPU methods with history */}
+      {historyStats && (
+        <div className="flex-shrink-0 border-t border-border p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Generation Metrics
+            </h3>
+            <span className="text-xs text-muted-foreground">{historyStats.count} samples</span>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-md bg-muted/50 p-2">
+              <p className="text-xs text-muted-foreground">Average</p>
+              <p className="text-sm font-semibold tabular-nums">{historyStats.avg.toFixed(3)} ms</p>
+            </div>
+            <div className="rounded-md bg-muted/50 p-2">
+              <p className="text-xs text-muted-foreground">Last</p>
+              <p className="text-sm font-semibold tabular-nums">{lastGenerationMs?.toFixed(3) ?? "—"} ms</p>
+            </div>
+            <div className="rounded-md bg-muted/50 p-2">
+              <p className="text-xs text-muted-foreground">Min</p>
+              <p className="text-sm font-semibold tabular-nums">{historyStats.min.toFixed(3)} ms</p>
+            </div>
+            <div className="rounded-md bg-muted/50 p-2">
+              <p className="text-xs text-muted-foreground">Max</p>
+              <p className="text-sm font-semibold tabular-nums">{historyStats.max.toFixed(3)} ms</p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            {onDownloadReport && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onDownloadReport}
+                className="flex-1"
+              >
+                <FileText className="mr-1.5 h-3.5 w-3.5" />
+                Report
+              </Button>
+            )}
+            {onClearHistory && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClearHistory}
+                className="flex-1"
+              >
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Action buttons - fixed at bottom */}
       <div className="flex-shrink-0 border-t border-border p-4">

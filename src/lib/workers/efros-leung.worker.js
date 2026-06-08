@@ -5,6 +5,24 @@
  * to prevent UI blocking and lag.
  */
 
+// Seeded random number generator for reproducibility
+let rngState = 42
+function seedRandom(seed) {
+  // Hash the seed string to a number
+  let hash = 0
+  const str = String(seed)
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  rngState = Math.abs(hash) || 42
+}
+
+function seededRandom() {
+  rngState = (rngState * 1103515245 + 12345) & 0x7fffffff
+  return rngState / 0x7fffffff
+}
+
 // Get pixel value at (x, y) with boundary handling
 function getPixel(data, width, height, x, y) {
   if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -108,13 +126,13 @@ function findBestMatch(sourceData, sourceWidth, sourceHeight, targetNeighborhood
 
   // Randomly select from best matches
   if (bestMatches.length > 0) {
-    const idx = Math.floor(Math.random() * Math.min(bestMatches.length, 10))
+    const idx = Math.floor(seededRandom() * Math.min(bestMatches.length, 10))
     return bestMatches[idx].pixel
   }
-
+  
   // Fallback: random pixel from source
-  const rx = Math.floor(Math.random() * sourceWidth)
-  const ry = Math.floor(Math.random() * sourceHeight)
+  const rx = Math.floor(seededRandom() * sourceWidth)
+  const ry = Math.floor(seededRandom() * sourceHeight)
   return getPixel(sourceData, sourceWidth, sourceHeight, rx, ry) || [128, 128, 128]
 }
 
@@ -224,6 +242,9 @@ function synthesize(sourceData, outputWidth, outputHeight, neighborhoodSize, err
 self.onmessage = (e) => {
   if (e.data.type === 'start') {
     try {
+      // Initialize seeded random for reproducibility
+      seedRandom(e.data.seed || "42")
+      
       // Validate input
       if (!e.data.sourceData || !e.data.sourceData.data) {
         throw new Error('Invalid source data')

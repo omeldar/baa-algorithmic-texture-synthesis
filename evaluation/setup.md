@@ -22,4 +22,4 @@ WebGPU enabled: yes
 
 ## Note
 
-For real-time feasabiltiy measured data is compared to 2nd computationally stronger setup.
+These are the laptop specs.

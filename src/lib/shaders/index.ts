@@ -5,6 +5,7 @@ import { hashSeed, getCommonFunctions, vertexShader, type ShaderParams } from ".
 import { perlinShader } from "./perlin"
 import { simplexShader } from "./simplex"
 import { worleyShader } from "./worley"
+import { woodShader } from "./wood"
 import type { TextureType } from "@/lib/texture-types"
 
 // Map texture types to their shader generators
@@ -13,6 +14,7 @@ const shaderGenerators: Partial<Record<TextureType, { generate: (params: ShaderP
   perlin: perlinShader,
   simplex: simplexShader,
   worley: worleyShader,
+  wood: woodShader,
 }
 
 /**

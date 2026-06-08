@@ -5,12 +5,13 @@ import { TEXTURE_DEFINITIONS, type TextureType } from "@/lib/texture-types"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Code2 } from "lucide-react"
+import { Play, Wand2 } from "lucide-react"
 
 interface TextureSidebarProps {
   selectedTexture: TextureType
   onSelectTexture: (texture: TextureType) => void
-  onOpenPlayground?: () => void
+  onOpenShowcase?: () => void
+  onOpenOptimizer?: () => void
 }
 
 const categoryLabels = {
@@ -27,7 +28,7 @@ const categoryColors = {
   optimisation: "bg-chart-5/20 text-chart-5 border-chart-5/30",
 }
 
-export function TextureSidebar({ selectedTexture, onSelectTexture, onOpenPlayground }: TextureSidebarProps) {
+export function TextureSidebar({ selectedTexture, onSelectTexture, onOpenShowcase, onOpenOptimizer }: TextureSidebarProps) {
   // Group textures by category
   const grouped = TEXTURE_DEFINITIONS.reduce(
     (acc, tex) => {
@@ -104,15 +105,26 @@ export function TextureSidebar({ selectedTexture, onSelectTexture, onOpenPlaygro
       </ScrollArea>
 
       <div className="border-t border-sidebar-border p-4 space-y-3">
-        {onOpenPlayground && (
+        {onOpenOptimizer && selectedTexture === "wood" && (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full gap-2"
+            onClick={onOpenOptimizer}
+          >
+            <Wand2 className="h-4 w-4" />
+            Match Reference Image
+          </Button>
+        )}
+        {onOpenShowcase && (
           <Button
             variant="outline"
             size="sm"
             className="w-full gap-2"
-            onClick={onOpenPlayground}
+            onClick={onOpenShowcase}
           >
-            <Code2 className="h-4 w-4" />
-            Shader Playground
+            <Play className="h-4 w-4" />
+            See it in Action
           </Button>
         )}
         <Badge

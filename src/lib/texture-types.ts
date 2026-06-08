@@ -20,8 +20,10 @@ export type TextureType =
   | "perlin"
   | "simplex"
   | "worley"
+  | "wood"
   | "efros-leung"
   | "image-quilting"
+  | "optimisation-based"
 
 /**
  * Categories of texture generation approaches
@@ -262,6 +264,183 @@ const WORLEY_DEFINITION: TextureDefinition = {
 }
 
 /**
+ * Wood - Procedural wood grain texture
+ * Built from layered noise, domain warping, and anisotropic distortion.
+ * Reference: Peachey (1985), Perlin (1985), Ebert et al. "Texturing and Modeling"
+ */
+const WOOD_DEFINITION: TextureDefinition = {
+  id: "wood",
+  name: "Wood",
+  description: "Procedural wood grain with domain warping and anisotropic distortion",
+  category: "procedural",
+  parameters: [
+    {
+      id: "seed",
+      label: "Seed",
+      type: "text",
+      default: "42",
+      description: "Controls the random pattern. Same seed produces identical wood grain."
+    },
+    // Spatial
+    {
+      id: "grainScale",
+      label: "Grain Scale",
+      type: "slider",
+      min: 1,
+      max: 20,
+      step: 0.5,
+      default: 8,
+      description: "Overall zoom level of the wood grain pattern. Lower = larger grain, higher = finer grain."
+    },
+    {
+      id: "anisotropy",
+      label: "Anisotropy",
+      type: "slider",
+      min: 0.1,
+      max: 1,
+      step: 0.05,
+      default: 0.3,
+      description: "Directional compression. Lower values create more elongated, vertical grain lines."
+    },
+    // Warping
+    {
+      id: "warpStrength",
+      label: "Warp Strength",
+      type: "slider",
+      min: 0,
+      max: 2,
+      step: 0.05,
+      default: 0.8,
+      description: "How much the grain pattern is distorted. Higher values create more organic, irregular patterns."
+    },
+    {
+      id: "warpScale",
+      label: "Warp Scale",
+      type: "slider",
+      min: 0.5,
+      max: 5,
+      step: 0.1,
+      default: 2,
+      description: "Frequency of the distortion. Higher = more frequent warping waves."
+    },
+    // Noise
+    {
+      id: "octaves",
+      label: "Octaves",
+      type: "slider",
+      min: 1,
+      max: 6,
+      step: 1,
+      default: 4,
+      description: "Number of noise layers. More octaves add finer detail but cost performance."
+    },
+    {
+      id: "persistence",
+      label: "Persistence",
+      type: "slider",
+      min: 0.1,
+      max: 0.9,
+      step: 0.05,
+      default: 0.5,
+      description: "How much each octave contributes. Lower = smoother, higher = rougher grain."
+    },
+    {
+      id: "lacunarity",
+      label: "Lacunarity",
+      type: "slider",
+      min: 1.5,
+      max: 3,
+      step: 0.1,
+      default: 2,
+      description: "Frequency multiplier per octave. Controls detail frequency scaling."
+    },
+    // Structure
+    {
+      id: "ridgeStrength",
+      label: "Ridge Strength",
+      type: "slider",
+      min: 0,
+      max: 1,
+      step: 0.05,
+      default: 0.4,
+      description: "Intensity of groove/ridge lines in the wood grain."
+    },
+    {
+      id: "detailStrength",
+      label: "Detail Strength",
+      type: "slider",
+      min: 0,
+      max: 0.5,
+      step: 0.02,
+      default: 0.15,
+      description: "Amplitude of fine fiber details on top of the main grain."
+    },
+    {
+      id: "crackStrength",
+      label: "Crack Strength",
+      type: "slider",
+      min: 0,
+      max: 0.5,
+      step: 0.02,
+      default: 0.1,
+      description: "Intensity of cellular crack patterns (Worley-based)."
+    },
+    {
+      id: "crackScale",
+      label: "Crack Scale",
+      type: "slider",
+      min: 2,
+      max: 15,
+      step: 0.5,
+      default: 6,
+      description: "Size of the crack cells. Higher = smaller, more frequent cracks."
+    },
+    // Appearance
+    {
+      id: "contrast",
+      label: "Contrast",
+      type: "slider",
+      min: 0.5,
+      max: 3,
+      step: 0.1,
+      default: 1.2,
+      description: "Exponent shaping for contrast. Higher = more dramatic light/dark separation."
+    },
+    {
+      id: "brightness",
+      label: "Brightness",
+      type: "slider",
+      min: -0.5,
+      max: 0.5,
+      step: 0.02,
+      default: 0,
+      description: "Overall brightness offset. Negative = darker, positive = lighter."
+    },
+    {
+      id: "colorLight",
+      label: "Light Color",
+      type: "text",
+      default: "#d4a574",
+      description: "The lighter wood color (hex). Used for highlighted grain areas."
+    },
+    {
+      id: "colorDark",
+      label: "Dark Color",
+      type: "text",
+      default: "#4a3728",
+      description: "The darker wood color (hex). Used for grain lines and shadows."
+    },
+    {
+      id: "animate",
+      label: "Animate",
+      type: "checkbox",
+      default: false,
+      description: "Slowly animate the pattern for visualization purposes."
+    },
+  ],
+}
+
+/**
  * Efros-Leung Example-Based Synthesis
  * Reference: Efros & Leung, "Texture Synthesis by Non-parametric Sampling" (SIGGRAPH 1999)
  */
@@ -271,6 +450,13 @@ const EFROS_LEUNG_DEFINITION: TextureDefinition = {
   description: "Non-parametric synthesis from sample images using neighborhood matching",
   category: "example-based",
   parameters: [
+    {
+      id: "seed",
+      label: "Seed",
+      type: "text",
+      default: "42",
+      description: "Controls randomness in pixel selection when multiple good matches exist. Same seed produces identical results for reproducibility."
+    },
     {
       id: "neighborhoodSize",
       label: "Neighborhood Size",
@@ -330,6 +516,13 @@ const IMAGE_QUILTING_DEFINITION: TextureDefinition = {
   category: "example-based",
   parameters: [
     {
+      id: "seed",
+      label: "Seed",
+      type: "text",
+      default: "42",
+      description: "Controls randomness in patch selection when multiple good matches exist. Same seed produces identical results for reproducibility."
+    },
+    {
       id: "patchSize",
       label: "Patch Size",
       type: "slider",
@@ -382,6 +575,67 @@ const IMAGE_QUILTING_DEFINITION: TextureDefinition = {
   ],
 }
 
+/**
+ * Optimisation-Based Texture Synthesis
+ * Uses iterative optimization (gradient descent) to find procedural noise parameters
+ * that best approximate a target reference image.
+ */
+const OPTIMISATION_BASED_DEFINITION: TextureDefinition = {
+  id: "optimisation-based",
+  name: "Optimisation-Based",
+  description: "Iteratively optimizes procedural texture parameters to match a reference image",
+  category: "optimisation",
+  parameters: [
+    {
+      id: "baseAlgorithm",
+      label: "Base Algorithm",
+      type: "select",
+      default: "wood",
+      description: "The procedural texture algorithm to optimize. Parameters of this algorithm will be adjusted to match your reference image."
+    },
+    {
+      id: "maxIterations",
+      label: "Max Iterations",
+      type: "slider",
+      min: 50,
+      max: 500,
+      step: 25,
+      default: 200,
+      description: "Maximum number of optimization steps. More iterations may find better matches but take longer."
+    },
+    {
+      id: "populationSize",
+      label: "Population Size",
+      type: "slider",
+      min: 10,
+      max: 50,
+      step: 5,
+      default: 20,
+      description: "Number of candidate solutions in each generation. Larger populations explore more possibilities but are slower."
+    },
+    {
+      id: "mutationRate",
+      label: "Mutation Rate",
+      type: "slider",
+      min: 0.05,
+      max: 0.5,
+      step: 0.05,
+      default: 0.15,
+      description: "Probability of random parameter changes. Higher values explore more but may miss optimal solutions."
+    },
+    {
+      id: "outputSize",
+      label: "Output Size",
+      type: "slider",
+      min: 64,
+      max: 256,
+      step: 32,
+      default: 128,
+      description: "Size of the generated texture during optimization. Smaller is faster but less accurate."
+    },
+  ],
+}
+
 // ============================================
 // EXPORTS
 // ============================================
@@ -393,8 +647,10 @@ export const TEXTURE_DEFINITIONS: TextureDefinition[] = [
   PERLIN_DEFINITION,
   SIMPLEX_DEFINITION,
   WORLEY_DEFINITION,
+  WOOD_DEFINITION,
   EFROS_LEUNG_DEFINITION,
   IMAGE_QUILTING_DEFINITION,
+  OPTIMISATION_BASED_DEFINITION,
 ]
 
 /**
@@ -404,8 +660,10 @@ export const TEXTURE_MAP: Record<TextureType, TextureDefinition> = {
   perlin: PERLIN_DEFINITION,
   simplex: SIMPLEX_DEFINITION,
   worley: WORLEY_DEFINITION,
+  wood: WOOD_DEFINITION,
   "efros-leung": EFROS_LEUNG_DEFINITION,
   "image-quilting": IMAGE_QUILTING_DEFINITION,
+  "optimisation-based": OPTIMISATION_BASED_DEFINITION,
 }
 
 // ============================================
