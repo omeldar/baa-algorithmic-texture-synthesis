@@ -4,7 +4,7 @@ This chapter describes the practical realization of the research prototype. It e
 
 \subsection{Technology Stack and Framework Selection}
 
-The prototype is a web application, which makes it portable, easy to distribute, and capable of accessing the GPU directly through modern browser APIs. The main technologies are summarized below.
+The prototype is a web application, which makes it portable, easy to distribute, and capable of accessing the \gls{gpu} directly through modern browser \gls{api}s. The main technologies are summarized below.
 
 \begin{table}[H]
     \centering
@@ -40,7 +40,7 @@ The prototype is a web application, which makes it portable, easy to distribute,
     \end{tabularx}
 \end{table}
 
-WebGPU was selected for procedural generation because it allows shader code (written in WGSL) to run massively in parallel on the GPU, which is essential for real-time texture generation. Example-based methods, which are inherently sequential, are instead executed on the CPU inside Web Workers so the user interface remains responsive during long computations.
+WebGPU was selected for procedural generation because it allows shader code (written in \gls{wgsl}) to run massively in parallel on the \gls{gpu}, which is essential for real-time texture generation. Example-based methods, which are inherently sequential, are instead executed on the \gls{cpu} inside Web Workers so the user interface remains responsive during long computations.
 
 \subsection{High-Level System Architecture}
 
@@ -48,23 +48,23 @@ The system is divided into two cooperating modules that share a common set of te
 
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Texture Synthesis Lab}: selects a method, edits its parameters, previews the result, and records generation metrics.
-    \item \textbf{Terrain Explorer}: applies generated textures to a procedural 3D world and records runtime performance.
+    \item \textbf{Terrain Explorer}: applies generated textures to a procedural \gls{3d} world and records runtime performance.
 \end{itemize}
 
-A central \texttt{texture-types} module defines every method, its category, and its adjustable parameters. This single source of truth drives both the parameter UI and the generation pipelines, ensuring that the Lab and the Explorer always interpret a method identically.
+A central \texttt{texture-types} module defines every method, its category, and its adjustable parameters. This single source of truth drives both the parameter \gls{ui} and the generation pipelines, ensuring that the Lab and the Explorer always interpret a method identically.
 
 \begin{figure}[H]
     \centering
     \img[width=1\textwidth]{figures/05/c2.png}
-    {C2-level architecture of the prototype, showing the main modules, their interactions, and the shared texture definitions.}
+    {\gls{c2}-level architecture of the prototype, showing the main modules, their interactions, and the shared texture definitions.}
     \label{fig:c2}
 \end{figure}
 
-Further C4-level architecture diagrams are provided in Appendix~\ref{appendix:c4-architecture-diagrams}. They document the main internal containers and implementation-related components that support the high-level architecture shown in Figure~\ref{fig:c2}.
+Further \gls{c4}-level architecture diagrams are provided in Appendix~\ref{appendix:c4-architecture-diagrams}. They document the main internal containers and implementation-related components that support the high-level architecture shown in Figure~\ref{fig:c2}.
 
 \subsection{Texture Generation Data Flow}
 
-When the user selects a texture method, the application loads the corresponding method definition from the shared texture-definition module. This definition contains the parameter identifiers, default values, value ranges, the classification category, and the rendering backend. From this definition the user interface automatically generates the matching control elements, so no method-specific UI code is required.
+When the user selects a texture method, the application loads the corresponding method definition from the shared texture-definition module. This definition contains the parameter identifiers, default values, value ranges, the classification category, and the rendering backend. From this definition the user interface automatically generates the matching control elements, so no method-specific \gls{ui} code is required.
 
 \begin{figure}[H]
     \centering
@@ -73,7 +73,7 @@ When the user selects a texture method, the application loads the corresponding 
     \label{fig:dataflow-seq-dia}
 \end{figure}
 
-Whenever a parameter changes, the current parameter set together with the active seed is forwarded to the selected generation pipeline. The system dispatches the request based on whether the method has a GPU shader implementation: procedural methods are routed to the WebGPU shader pipeline, while example-based methods are executed inside a Web Worker. The generated result is then either shown as a preview in the Texture Synthesis Lab or assigned to material slots inside the Terrain Explorer. Because both consumers read from the same definition, a method only has to be implemented once.
+Whenever a parameter changes, the current parameter set together with the active seed is forwarded to the selected generation pipeline. The system dispatches the request based on whether the method has a \gls{gpu} shader implementation: procedural methods are routed to the WebGPU shader pipeline, while example-based methods are executed inside a Web Worker. The generated result is then either shown as a preview in the Texture Synthesis Lab or assigned to material slots inside the Terrain Explorer. Because both consumers read from the same definition, a method only has to be implemented once.
 
 \clearpage
 \subsection{Parameter Definition and Control System}
@@ -124,16 +124,16 @@ interface TextureParameter {
 
 \section{Procedural Environment Foundation}
 
-Before describing the procedural environment, it is important to clarify its role in this thesis. The terrain and scene composition are not the main research focus, but serve as a controlled testbed for evaluating texture synthesis methods under real-time conditions. This 3D environment provides a practical context in which generated textures can be applied, measured, and compared with respect to frame rate, scalability, and caching behaviour.
+Before describing the procedural environment, it is important to clarify its role in this thesis. The terrain and scene composition are not the main research focus, but serve as a controlled testbed for evaluating texture synthesis methods under real-time conditions. This \gls{3d} environment provides a practical context in which generated textures can be applied, measured, and compared with respect to frame rate, scalability, and caching behaviour.
 
 \subsection{Terrain Generation}
 
-The 3D environment is an infinite, procedurally generated landscape. Terrain height is computed entirely from layered noise functions, with no stored height maps. Several noise layers are combined to produce believable geography:
+The \gls{3d} environment is an infinite, procedurally generated landscape. Terrain height is computed entirely from layered noise functions, with no stored height maps. Several noise layers are combined to produce believable geography:
 
 \begin{itemize}[noitemsep, topsep=0pt]
-    \item \textbf{Continental shape}: low-frequency fractal Brownian motion (fBm) for large landmasses.
+    \item \textbf{Continental shape}: low-frequency \gls{fbm} for large landmasses.
     \item \textbf{Mountains}: ridged noise masked by a separate low-frequency field so peaks only appear in certain regions.
-    \item \textbf{Hills and details}: higher-frequency fBm layers for medium and fine variation.
+    \item \textbf{Hills and details}: higher-frequency \gls{fbm} layers for medium and fine variation.
     \item \textbf{Erosion}: turbulence subtracted from the surface to carve valleys.
 \end{itemize}
 
@@ -166,7 +166,7 @@ This composition is what makes the prototype useful for comparison: the same sce
 
 \subsection{Real-Time Rendering Pipeline}
 
-Rendering is handled by React Three Fiber, a declarative wrapper around three.js. The world is divided into chunks that are generated and discarded as the camera moves, giving the impression of an endless landscape while keeping the number of active meshes bounded. Procedural textures are generated on the GPU and applied directly as material maps, while the renderer loop continuously reports frame timing to the measurement system described in Section~\ref{sec:measurement-system}.
+Rendering is handled by React Three Fiber, a declarative wrapper around three.js. The world is divided into chunks that are generated and discarded as the camera moves, giving the impression of an endless landscape while keeping the number of active meshes bounded. Procedural textures are generated on the \gls{gpu} and applied directly as material maps, while the renderer loop continuously reports frame timing to the measurement system described in Section~\ref{sec:measurement-system}.
 
 \section{Texture Synthesis Implementation}
 
@@ -208,15 +208,15 @@ The prototype implements seven methods across four categories. The table below g
 
 \subsection{Implemented Procedural Methods}
 
-The three procedural methods are implemented as WGSL fragment shaders that run on the GPU. They generate textures purely from mathematical functions and a seed, with no input image.
+The three procedural methods are implemented as \gls{wgsl} fragment shaders that run on the \gls{gpu}. They generate textures purely from mathematical functions and a seed, with no input image.
 
 \begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Perlin Noise}: the classic gradient noise, exposed through scale, octaves, persistence, and lacunarity parameters. It forms the conceptual foundation for the other procedural methods.
     \item \textbf{Simplex Noise}: an improved gradient noise with fewer directional artifacts, offering contrast, brightness, and domain-warp controls.
-    \item \textbf{Wood}: the most complex procedural shader, combining several techniques to imitate real wood grain: anisotropic coordinate compression, domain warping, multi-octave fBm, ridged noise for grooves, and Worley-based surface cracks. It exposes sixteen parameters, including two configurable end colors.
+    \item \textbf{Wood}: the most complex procedural shader, combining several techniques to imitate real wood grain: anisotropic coordinate compression, domain warping, multi-octave \gls{fbm}, ridged noise for grooves, and Worley-based surface cracks. It exposes sixteen parameters, including two configurable end colors.
 \end{itemize}
 
-Because all three run on the GPU, generation is effectively instantaneous, which is what makes them suitable for real-time use.
+Because all three run on the \gls{gpu}, generation is effectively instantaneous, which is what makes them suitable for real-time use.
 
 \begin{figure}[htbp]
     \centering
@@ -231,9 +231,9 @@ Because all three run on the GPU, generation is effectively instantaneous, which
 
 \subsubsection{Wood Grain Shader Implementation}
 
-The Wood shader is implemented as a layered procedural model evaluated once per output texel. First, the texture coordinates are scaled by a grain factor and compressed along one axis (anisotropy) to imitate the directional fibre structure of wood. To avoid perfectly regular, artificial-looking rings, domain warping is applied before the pattern is evaluated: a primary warp displaces the coordinate based on a low-frequency fBm value, and a secondaryt, smaller warp adds organic irregularity.
+The Wood shader is implemented as a layered procedural model evaluated once per output texel. First, the texture coordinates are scaled by a grain factor and compressed along one axis (anisotropy) to imitate the directional fibre structure of wood. To avoid perfectly regular, artificial-looking rings, domain warping is applied before the pattern is evaluated: a primary warp displaces the coordinate based on a low-frequency \gls{fbm} value, and a secondaryt, smaller warp adds organic irregularity.
 
-On the warped coordinates, a base structure is generated using fractal Brownian motion (fBm), which sums several octaves of Perlin noise with decreasing amplitude and increasing frequency. A ridged-noise layer is added on top to create the darker groove and grain lines, and a high-frequency fBm layer introduces fine fibre detail. An optional cellular (Worley) component subtracts crack-like features by measuring the distance to the nearest feature point in a \texttt{3x3} cell neighbourhood. Finally, the scalar pattern value is contrast-shaped and brightness-adjusted, then mapped between two configurable colors, with a subtle low-frequency modulation added for additional realism.
+On the warped coordinates, a base structure is generated using \gls{fbm}, which sums several octaves of Perlin noise with decreasing amplitude and increasing frequency. A ridged-noise layer is added on top to create the darker groove and grain lines, and a high-frequency \gls{fbm} layer introduces fine fibre detail. An optional cellular (Worley) component subtracts crack-like features by measuring the distance to the nearest feature point in a \texttt{3x3} cell neighbourhood. Finally, the scalar pattern value is contrast-shaped and brightness-adjusted, then mapped between two configurable colors, with a subtle low-frequency modulation added for additional realism.
 
 A detailed diagram can be found in Appendix~\ref{app:appendix-woodgrain-flowchart}, Figure~\ref{fig:woodgrain-flowchart}.
 
@@ -306,15 +306,15 @@ The genetic algorithm maintains a population of candidate parameter sets and evo
 
 \subsection{Runtime Challenges}
 
-The central runtime challenge is that the methods have radically different cost profiles. Procedural shaders generate a texture in well under a millisecond on the GPU, whereas the example-based methods are sequential CPU algorithms that may take several seconds for a single texture. In a real-time environment that must maintain roughly 60 frames per second (a budget of about 16 milliseconds per frame), this difference determines which methods are usable at runtime at all.
+The central runtime challenge is that the methods have radically different cost profiles. Procedural shaders generate a texture in well under a millisecond on the \gls{gpu}, whereas the example-based methods are sequential \gls{cpu} algorithms that may take several seconds for a single texture. In a real-time environment that must maintain roughly 60 frames per second (a budget of about 16 milliseconds per frame), this difference determines which methods are usable at runtime at all.
 
 \subsection{Optimization Strategies}
 
 Several strategies keep the application responsive:
 
 \begin{itemize}[noitemsep, topsep=0pt]
-    \item \textbf{GPU offloading}: all procedural and rule-based generation runs in parallel on the GPU.
-    \item \textbf{Web Workers}: slow CPU methods run on background threads so the UI never freezes.
+    \item \textbf{\gls{gpu} offloading}: all procedural and rule-based generation runs in parallel on the \gls{gpu}.
+    \item \textbf{Web Workers}: slow \gls{cpu} methods run on background threads so the \gls{ui} never freezes.
     \item \textbf{Chunked terrain}: only nearby world chunks are kept active, bounding memory and draw calls.
     \item \textbf{Texture reuse}: objects can share a generated texture by chunking their seeds, so a single texture is generated once and reused across many similar objects, dramatically reducing generation cost while preserving visual variety.
 \end{itemize}
@@ -372,7 +372,7 @@ The prototype measures performance in both modules:
 
 \begin{figure}[H]
     \centering
-    \img[width=0.95\textwidth]{figures/05/record-graphs.png}
+    \img[width=0.70\textwidth]{figures/05/record-graphs.png}
     {The graphs show the data collected during a recording session in the Terrain Explorer, including frame rate, render time, texture generation time, and chunk generation time. The graphs update in real time as the session progresses, allowing for immediate analysis of performance trends.}
     \label{fig:live-graphs}
 \end{figure}
@@ -411,13 +411,14 @@ The metrics collected map directly onto the research questions, which compare me
 
 \subsection{Reproducibility and Controlled Experiments}
 
-Reproducibility is enforced through a shared seeded random-number generator used by terrain, object placement, and texture generation alike. Given the same seed and parameters, the prototype reproduces an identical world and identical textures. To support controlled experiments, complete environment configurations can be saved and reloaded, and all summary reports (PDF) and raw, self-documenting timing data (CSV) can be exported for external analysis. This allows each experiment to be repeated exactly and the resulting data to be examined independently of the application.
+Reproducibility is enforced through a shared seeded random-number generator used by terrain, object placement, and texture generation alike. Given the same seed and parameters, the prototype reproduces an identical world and identical textures. To support controlled experiments, complete environment configurations can be saved and reloaded, and all summary reports (\gls{pdf}) and raw, self-documenting timing data (\gls{csv}) can be exported for external analysis. This allows each experiment to be repeated exactly and the resulting data to be examined independently of the application.
 
+\clearpage
 Building on these saved configurations, the prototype additionally automates the repeated execution of experiments, so that statistically meaningful measurements can be gathered without manual supervision, as described in the following section.
 
 \subsection{Automated Batch Execution and Experiment Queuing}
 
-A single recording captures only one 60-second sample of one configuration. This is not enough for a reliable evaluation, because runtime metrics like frame rate and generation time are affected by measurement noise from browser scheduling and GPU behaviour. In addition, the research questions require the same metrics across several different configurations to compare them with each other. Doing this by hand is slow and error-prone, so two levels of automation were added: repeating one configuration (batch runs) and running many configurations after each other (experiment queuing).
+A single recording captures only one 60-second sample of one configuration. This is not enough for a reliable evaluation, because runtime metrics like frame rate and generation time are affected by measurement noise from browser scheduling and \gls{gpu} behaviour. In addition, the research questions require the same metrics across several different configurations to compare them with each other. Doing this by hand is slow and error-prone, so two levels of automation were added: repeating one configuration (batch runs) and running many configurations after each other (experiment queuing).
 
 A batch executes the same frozen configuration several times in a row (one, five, or ten runs). Between the runs the environment is reset deterministically from the stored seed, so every run starts from the same state. This turns a single observation into a small distribution and gives an estimate of the measurement variance. The queue extends this idea to many configurations: each uploaded configuration is applied to the environment, given a short moment to settle, and then recorded as a full batch, before the queue automatically continues with the next one. Because such a series can easily take more than an hour, it can be started once and left running unattended.
 
@@ -455,4 +456,4 @@ This keeps the memory usage bounded by a single configuration instead of the who
 
 \section{Summary of the Implementation}
 
-The implemented prototype fulfills its role as a research instrument. It combines a deterministic procedural 3D environment, seven texture synthesis methods spanning procedural, rule-based, example-based, and optimization-based categories, and a built-in measurement and reporting system. GPU-based procedural methods provide instantaneous generation. Rule-based generation demonstrates structural pattern control, and the example-based and optimization methods make it possible to study how closely algorithmic textures can approximate a target. With reproducible seeding, configurable experiments, and exportable metrics, the prototype provides the controlled and measurable foundation required for the evaluation presented in the following chapter.
+The implemented prototype fulfills its role as a research instrument. It combines a deterministic procedural \gls{3d} environment, seven texture synthesis methods spanning procedural, rule-based, example-based, and optimization-based categories, and a built-in measurement and reporting system. \gls{gpu}-based procedural methods provide instantaneous generation. Rule-based generation demonstrates structural pattern control, and the example-based and optimization methods make it possible to study how closely algorithmic textures can approximate a target. With reproducible seeding, configurable experiments, and exportable metrics, the prototype provides the controlled and measurable foundation required for the evaluation presented in the following chapter.

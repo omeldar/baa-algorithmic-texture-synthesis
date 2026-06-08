@@ -4,7 +4,7 @@ This thesis investigated how algorithmic texture synthesis methods can be used i
 
 The results show that procedural texture generation is the most suitable approach for the selected real-time use case. Procedural methods provide controllable visual variation with relatively low runtime cost. Rule-based methods are also useful for structured patterns such as cellular or crack-like textures, but their suitability depends strongly on the concrete algorithm and its complexity.
 
-The performance evaluation showed that the prototype runs interactively on suitable desktop hardware, while more demanding configurations are not suitable for very weak laptop hardware. This confirms that browser-based procedural rendering is feasible, but still depends strongly on GPU performance and scene complexity.
+The performance evaluation showed that the prototype runs interactively on suitable desktop hardware, while more demanding configurations are not suitable for very weak laptop hardware. This confirms that browser-based procedural rendering is feasible, but still depends strongly on \gls{gpu} performance and scene complexity.
 
 Optimization-based approximation was investigated separately. It can help estimate useful parameters for approximating a target texture, but it is too slow for direct real-time generation in the current prototype. It is therefore better suited as an offline or pre-processing step.
 
@@ -18,7 +18,7 @@ Another important direction is the improvement of visual quality metrics. The cu
 
 Further work could also improve optimization-based approximation. More efficient search strategies, better similarity metrics, and method-specific parameter spaces could make target texture approximation more useful. Since optimization is not real-time feasible in the current form, it would be most suitable as an offline process for generating presets that can later be used in the real-time environment.
 
-Finally, the prototype could be tested on a wider range of hardware and browser environments. This would make the performance conclusions more general and help identify which parts of the system are limited by the implementation, the browser, or the GPU hardware.
+Finally, the prototype could be tested on a wider range of hardware and browser environments. This would make the performance conclusions more general and help identify which parts of the system are limited by the implementation, the browser, or the \gls{gpu} hardware.
 
 \section{Personal Reflection}
 

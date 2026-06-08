@@ -2,7 +2,7 @@
 
 In computer graphics, textures are used to represent surface details of objects without increasing geometric complexity. Instead of modeling every small feature with additional polygons, textures store visual information that can be applied to surfaces during rendering \cite{watt1993computergraphics}. This approach allows objects to appear visually complex while keeping the underlying geometry relatively simple.
 
-A widely used technique for applying textures to 3D objects is \textit{texture mapping}. Texture mapping describes the process of projecting a two-dimensional image onto the surface of a three-dimensional model in order to add visual detail \cite{watt1993computergraphics}. During rendering, the graphics system samples values from the texture image and uses them to determine the appearance of the surface.
+A widely used technique for applying textures to \gls{3d} objects is \textit{texture mapping}. Texture mapping describes the process of projecting a two-dimensional image onto the surface of a three-dimensional model in order to add visual detail \cite{watt1993computergraphics}. During rendering, the graphics system samples values from the texture image and uses them to determine the appearance of the surface.
 
 \begin{figure}[H]
     \centering
@@ -11,7 +11,7 @@ A widely used technique for applying textures to 3D objects is \textit{texture m
     \label{fig:texture-mapping-cube}
 \end{figure}
 
-To correctly map textures onto geometry, each point on the surface must correspond to coordinates in the texture image. These coordinates are typically called \gls{uv}. The letters $U$ and $V$ refer to the axes of the two-dimensional texture space and represent the horizontal and vertical directions of the texture image \cite{wiki_texture_mapping}. In practice, the surface of a 3D model is parameterized into this two-dimensional coordinate system so that texture images can be applied to it.
+To correctly map textures onto geometry, each point on the surface must correspond to coordinates in the texture image. These coordinates are typically called \gls{uv}. The letters $U$ and $V$ refer to the axes of the two-dimensional texture space and represent the horizontal and vertical directions of the texture image \cite{wiki_texture_mapping}. In practice, the surface of a \gls{3d} model is parameterized into this two-dimensional coordinate system so that texture images can be applied to it.
 
 The use of textures significantly improves rendering efficiency. Instead of modeling every visual detail explicitly, textures allow complex patterns to be stored in images and reused across many surfaces \cite{akenine2018realtime}. This makes texture mapping particularly important in real-time applications such as games and simulations where computational resources are limited.
 
@@ -85,12 +85,12 @@ One of the main advantages of procedural textures is that they require very litt
 
 Procedural textures are typically based on mathematical functions that generate patterns across a surface. One of the most influential techniques in procedural texturing is \textit{noise-based texturing}. Noise functions generate pseudo-random values that vary smoothly across space and can be used to simulate natural variations found in materials such as stone, marble, clouds, or terrain \cite{ebert2003texturing}. A well-known example is \textit{Perlin noise}, which was introduced by Ken Perlin and is widely used to generate natural-looking stochastic textures.
 
-By combining multiple noise functions with different frequencies and amplitudes, more complex patterns can be created. A common technique is \textit{fractal Brownian motion (fBm)}, which generates fractal-like structures by summing several layers of noise at different scales \cite{ebert2003texturing}. These layered noise functions allow procedural models to simulate complex natural phenomena while still being controlled by a small number of parameters.
+By combining multiple noise functions with different frequencies and amplitudes, more complex patterns can be created. A common technique is \gls{fbm}, which generates fractal-like structures by summing several layers of noise at different scales \cite{ebert2003texturing}. These layered noise functions allow procedural models to simulate complex natural phenomena while still being controlled by a small number of parameters.
 
 \begin{figure}[H]
     \centering
     \img[width=1\textwidth]{figures/02/perlin-octaves-comparison.png}
-    {Illustration of fractal Brownian motion (fBm) using Perlin noise. Increasing numbers of octaves are combined from left to right, adding higher-frequency detail at each step and producing progressively more complex, multi-scale structures.}
+    {Illustration of \gls{fbm} using Perlin noise. Increasing numbers of octaves are combined from left to right, adding higher-frequency detail at each step and producing progressively more complex, multi-scale structures.}
     \label{fig:perlin-octaves-comparison}
 \end{figure}
 
@@ -141,9 +141,10 @@ Typical use cases include terrain, vegetation, building materials, natural effec
 
 \section{Existing Systems and Tools for Texture Synthesis}
 
-Various systems and tools for procedural texture synthesis already exist in industry and research. Dedicated material tools such as Adobe Substance 3D Designer \cite{substance_designer} and Material Maker \cite{material_maker} use node-based workflows to create textures and materials through procedural operations. Larger graphics environments such as Blender \cite{blender}, Houdini \cite{houdini}, and Unreal Engine \cite{unreal_engine} also integrate procedural texturing into rendering and content creation pipelines.
+Various systems and tools for procedural texture synthesis already exist in industry and research. Dedicated material tools such as Adobe Substance \gls{3d} Designer \cite{substance_designer} and Material Maker \cite{material_maker} use node-based workflows to create textures and materials through procedural operations. Larger graphics environments such as Blender \cite{blender}, Houdini \cite{houdini}, and Unreal Engine \cite{unreal_engine} also integrate procedural texturing into rendering and content creation pipelines.
 
-Research continues to investigate topics such as semantic procedural generation, optimization-based texture approximation, and AI-assisted material generation \cite{wang2017semantic}. These approaches aim to automate procedural workflows and improve the approximation of target textures.
+\clearpage
+Research continues to investigate topics such as semantic procedural generation, optimization-based texture approximation, and \gls{ai}-assisted material generation \cite{wang2017semantic}. These approaches aim to automate procedural workflows and improve the approximation of target textures.
 
 Although existing systems provide powerful procedural capabilities, they are mainly designed for production workflows rather than controlled scientific comparison. Many tools hide implementation details and include internal optimizations, which makes reproducible runtime measurements and direct algorithm comparison more difficult. Therefore, this thesis uses a dedicated research prototype for controlled evaluation of procedural and rule-based texture synthesis methods in a real-time environment.
 
