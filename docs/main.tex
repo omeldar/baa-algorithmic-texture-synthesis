@@ -82,7 +82,15 @@
 
   \vspace{0.5cm}
 
-  TBD ...
+  Algorithmic texture synthesis offers an alternative to traditional image-based texture workflows by generating surface patterns through mathematical functions, rules, and parameterized models. This is especially relevant for procedural real-time environments, where large amounts of visual variation are needed while storage usage, controllability, and runtime performance remain important.
+
+  This thesis investigates how procedural, rule-based, and optimization-based texture synthesis methods can be implemented and evaluated in a browser-based real-time graphics prototype. The developed system combines a texture synthesis laboratory with a procedural terrain explorer. This makes it possible to generate textures, adjust parameters, apply the results to a 3D environment, and measure runtime behaviour under controlled conditions.
+
+  The implementation includes procedural methods such as Perlin noise, Simplex noise, and a layered Wood shader, as well as a rule-based Worley cracks model and an optimization-based parameter search for approximating a target texture. The evaluation focuses on frame rate, render time, texture generation cost, scalability, texture reuse, reproducibility, visual quality, and parameter controllability.
+
+  The results show that procedural methods are the most suitable approach for the tested real-time use case, especially when combined with GPU-based generation and texture reuse strategies. Rule-based methods can also produce useful structured patterns, but their performance depends strongly on the complexity of the algorithm. Optimization-based approximation can improve the similarity between a generated procedural texture and a target image, but it is more suitable as an offline parameter search method than as a real-time generation technique.
+
+  Overall, the thesis demonstrates that algorithmic texture synthesis can improve variation and controllability in procedural real-time environments. However, the practical suitability of each method depends on algorithmic complexity, hardware performance, caching strategy, and the intended visual result.
 
 \end{center}
 

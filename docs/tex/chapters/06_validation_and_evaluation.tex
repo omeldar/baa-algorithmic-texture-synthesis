@@ -2,6 +2,8 @@
 
 The evaluation was conducted to validate whether the implemented prototype is suitable for investigating algorithmic texture synthesis methods in procedural real-time environments. The focus is not only on the visual appearance of generated textures, but also on runtime behaviour, reproducibility, parameter controllability, and suitability for interactive use.
 
+All raw measurement files, generated plots, and evaluation scripts are stored in the project repository. The relevant folder structure is documented in Appendix~\ref{appendix:repository-structure}.
+
 All tests were performed with the browser-based prototype described in Chapter~5. The Terrain Explorer was used for measurements inside the procedural 3D environment, while the Texture Synthesis Lab was used for isolated texture generation tests. Unless stated otherwise, WebGPU was enabled in the Brave browser. For Terrain Explorer recordings, the camera was reset before each run and auto movement was enabled to keep the scene traversal comparable.
 
 \begin{table}[H]
@@ -283,6 +285,7 @@ Figure~\ref{fig:texture-reuse} shows that higher texture reuse reduces the measu
     \label{fig:texture-reuse}
 \end{figure}
 
+\clearpage
 The texture generation cost also decreases slightly, from approximately 9.53 ms in the unique configuration to 7.15 ms with reuse 25 and 6.27 ms with reuse 50. The effect is smaller than for render time, but still shows that avoiding unnecessary texture variation can reduce generation overhead.
 
 The frame rate results show the same general trend. The average FPS remains high in all three configurations, but the minimum FPS improves strongly when reuse is enabled. In the unique configuration, the minimum FPS drops to approximately 22.9 FPS, while reuse 25 reaches approximately 75.0 FPS and reuse 50 reaches approximately 93.6 FPS. This suggests that texture reuse mainly improves stability and reduces heavy frame drops.

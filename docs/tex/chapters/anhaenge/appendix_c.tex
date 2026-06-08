@@ -1,1 +1,28 @@
-Appendix C.
+\subsection{Repository Structure for Evaluation Data}
+\label{appendix:repository-structure}
+
+The evaluation data and scripts used for the thesis are stored in the project repository. The most relevant folders are listed below to make the experimental data easier to locate and reproduce.
+
+\begin{table}[H]
+\centering
+\caption{Repository structure for evaluation data and generated thesis artifacts}
+\label{tab:repository_structure}
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\textbf{Path} & \textbf{Content} \\
+\hline
+\hline
+\texttt{evaluation/results/desktop/} & Raw CSV measurement data from the desktop evaluation runs. \\
+\hline
+\texttt{evaluation/results/desktop/checkpoint-*} & Individual checkpoint folders containing repeated run files and configuration files for each experiment. \\
+\hline
+\texttt{evaluation/results/desktop/evaluation-output/} & Aggregated CSV files and generated plots used in Chapter~6. \\
+\hline
+\texttt{docs/figures/06/} & Final evaluation figures included in the thesis. \\
+\hline
+\texttt{docs/figures/appendix/} & Additional appendix figures, including Wood parameter examples and optimization results. \\
+\hline
+\texttt{docs/tex/chapters/} & LaTeX source files for the written thesis chapters. \\
+\hline
+\end{tabularx}
+\end{table}
