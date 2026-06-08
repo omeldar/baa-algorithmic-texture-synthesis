@@ -64,9 +64,9 @@ Each Terrain Explorer test recorded timing data over a fixed interval of 60 seco
 
 \section{Evaluation Method}
 
-The evaluation follows a controlled experimental approach. Each test changes one main factor where possible, while the remaining configuration stays constant. This makes it easier to isolate the influence of parameters such as view distance, terrain quality, texture reuse, or synthesis method.
+The evaluation follows a controlled experimental approach. Where possible, each test changes one main factor while the remaining configuration stays constant. This makes it easier to isolate the influence of parameters such as view distance, terrain quality, texture reuse, or synthesis method.
 
-The experiments are grouped into several categories. Baseline and quality tests measure the general performance of the Terrain Explorer. Scalability tests investigate the influence of scene complexity. Texture reuse tests evaluate caching behaviour. Method comparison tests compare the runtime feasibility of different synthesis approaches. Additional tests examine optimization-based approximation, reproducibility, and visual controllability.
+The experiments are grouped into the categories shown in Table~\ref{tab:evaluation-categories}. They cover general runtime performance, scalability, caching behaviour, synthesis method comparison, optimization-based approximation, reproducibility, and qualitative parameter controllability.
 
 \begin{table}[H]
 \centering
@@ -77,24 +77,24 @@ The experiments are grouped into several categories. Baseline and quality tests 
 \textbf{Evaluation category} & \textbf{Purpose} \\
 \hline
 \hline
-Baseline and quality settings & Measures the general runtime behaviour of the Terrain Explorer under low, default, and high quality configurations. \\
+Baseline and quality settings & Measures runtime behaviour under low, default, and high quality configurations. \\
 \hline
-Scalability tests & Investigates how increasing scene complexity, such as view distance or terrain quality, affects performance. \\
+Scalability tests & Investigates the influence of scene complexity, especially view distance. \\
 \hline
-Texture reuse and caching & Evaluates whether reusing generated textures and cached resources reduces runtime cost. \\
+Texture reuse and caching & Evaluates whether texture reuse reduces runtime cost and improves stability. \\
 \hline
-Synthesis method comparison & Compares procedural, rule-based, example-based, and optimization-based methods with respect to real-time feasibility. \\
+Synthesis method comparison & Compares implemented texture methods with respect to real-time feasibility. \\
 \hline
-Optimization-based approximation & Analyzes whether procedural parameters can be estimated to approximate a target texture. \\
+Optimization-based approximation & Analyzes whether procedural parameters can approximate a target texture. \\
 \hline
-Reproducibility tests & Checks whether identical seeds and configurations lead to stable and repeatable results. \\
+Reproducibility tests & Checks whether identical seeds and configurations lead to repeatable results. \\
 \hline
-Visual comparison and controllability & Evaluates whether generated textures show useful variation and whether parameter changes are understandable. \\
+Visual comparison and controllability & Evaluates generated texture variation and the effect of parameter changes. \\
 \hline
 \end{tabularx}
 \end{table}
 
-The main quantitative metrics are average FPS, minimum FPS, maximum FPS, average render time, average texture generation time, average chunk generation time, and standard deviation. FPS is used as the primary indicator for interactive performance. Render time measures the cost of rendering the visible scene, texture generation time measures the cost of generating textures, and chunk generation time measures the cost of updating the procedural terrain.
+The main quantitative metrics are summarized in Table~\ref{tab:evaluation-metrics}. FPS is used as the main indicator for interactive performance. Render time describes the cost of drawing the visible scene, texture generation time describes the cost of generating textures, and chunk generation time describes the cost of updating procedural terrain chunks.
 
 \begin{table}[H]
 \centering
@@ -105,56 +105,29 @@ The main quantitative metrics are average FPS, minimum FPS, maximum FPS, average
 \textbf{Metric} & \textbf{Meaning} \\
 \hline
 \hline
-Average FPS & Indicates the general interactive performance during a recording session. \\
+Average FPS & General interactive performance during a recording session. \\
 \hline
-Minimum FPS & Shows temporary performance drops and worst-case behaviour during a run. \\
+Minimum FPS & Temporary performance drops and worst-case behaviour. \\
 \hline
-Maximum FPS & Shows the highest observed frame rate during a run. \\
+Average render time & Average rendering cost of the visible scene. \\
 \hline
-Average render time & Measures the average rendering cost of the visible scene. \\
+Average texture generation time & Average cost of generating textures during the test. \\
 \hline
-Average texture generation time & Measures the average cost of generating textures during the test. \\
+Average chunk generation time & Average cost of generating or updating terrain chunks. \\
 \hline
-Average chunk generation time & Measures the average cost of generating or updating terrain chunks. \\
-\hline
-Standard deviation & Describes how stable repeated measurements are across multiple runs. \\
+Standard deviation & Stability of repeated measurements across multiple runs. \\
 \hline
 \end{tabularx}
 \end{table}
 
-For real-time feasibility, the measurements are compared against common interactive rendering targets. The main target is 60 FPS, corresponding to approximately 16.67 ms per frame. A lower boundary of 30 FPS, or approximately 33.33 ms per frame, is used for acceptable interactive behaviour. Texture generation methods that significantly exceed these budgets are considered unsuitable for direct runtime generation inside the Terrain Explorer.
+For real-time feasibility, the results are compared against two common frame-time budgets: 60 FPS, corresponding to approximately 16.67 ms per frame, and 30 FPS, corresponding to approximately 33.33 ms per frame. Methods that significantly exceed these budgets are considered unsuitable for direct runtime generation in the Terrain Explorer.
 
-Important measurements were repeated multiple times and aggregated using the arithmetic mean and standard deviation. This reduces the influence of temporary browser, operating system, or GPU scheduling fluctuations and makes small performance differences more reliable.
+Important measurements were repeated multiple times and aggregated using the arithmetic mean and standard deviation. Most final performance configurations were executed ten times. Texture Lab generation tests used ten generated samples per method, while optimization runs were repeated five times.
 
-\begin{table}[H]
-\centering
-\caption{Repetition strategy for final evaluation runs}
-\label{tab:evaluation-repetitions}
-\begin{tabularx}{\textwidth}{|l|X|}
-\hline
-\textbf{Test type} & \textbf{Repetition strategy} \\
-\hline
-\hline
-Baseline performance & 10 repeated runs with identical settings. \\
-\hline
-View distance scaling & 10 repeated runs per view distance setting. \\
-\hline
-Texture reuse impact & 10 repeated runs per reuse configuration. \\
-\hline
-GPU method comparison & 10 repeated runs per method. \\
-\hline
-Texture Lab generation times & 10 generated samples per method. \\
-\hline
-Optimization runs & 5 repeated runs. \\
-\hline
-\end{tabularx}
-\end{table}
-
-The evaluation distinguishes between online and offline suitability. GPU-based procedural and rule-based methods are tested directly in the Terrain Explorer because they are intended for interactive use. CPU-based example methods, such as Efros-Leung and Image Quilting, are evaluated separately in the Texture Synthesis Lab. The genetic algorithm optimizer is also evaluated separately, since it is intended for parameter search rather than per-frame texture generation.
+The evaluation distinguishes between online and offline suitability. GPU-based procedural and rule-based methods are tested directly in the Terrain Explorer because they are intended for interactive use. CPU-based example methods and the genetic algorithm optimizer are evaluated separately in the Texture Synthesis Lab, since they are not intended for per-frame texture generation.
 
 Qualitative evaluation complements the measurements. Generated textures are inspected visually to assess variation, parameter controllability, and suitability for material categories such as wood, stone, terrain, or cracks. For optimization-based approximation, the target texture, initial result, and optimized result are compared side by side. All following diagrams are based on exported CSV data from the prototype and use averaged values with standard deviation or error bars where repeated measurements are available.
 
-\clearpage
 \section{Performance of the Procedural Environment}
 \label{sec:performance_procedural_environment}
 
@@ -175,11 +148,11 @@ Figure~\ref{fig:quality_performance} shows the measured frame rate and runtime c
 
 \subsection{Frame Rate Results}
 
-The results show that all three quality configurations remain clearly above the 60 FPS target in terms of average frame rate. Low quality reaches approximately 116 FPS on average, the baseline configuration reaches approximately 118 FPS, and high quality reaches approximately 112.5 FPS. The small difference between low quality and baseline should not be overinterpreted, since it is likely within normal measurement variation.
+The results show that all three quality configurations remain clearly above the 60 FPS target in terms of average frame rate. The differences between low quality and baseline are small and should not be overinterpreted, since they are likely within normal measurement variation.
 
-The minimum FPS values show a clearer difference. Low quality and baseline remain stable at around 110 FPS, while high quality reaches a mean minimum FPS of approximately 88 FPS across the ten test runs. In addition to this averaged minimum value, the lowest minimum FPS observed in a single high quality run was 71 FPS. This distinction is important because the table reports the mean over all runs, while the 71 FPS value describes the lowest individual recording.
+The minimum FPS values show a clearer effect. Low quality and baseline remain very stable, while the high quality configuration introduces more variation due to the increased rendering workload. However, even the lowest observed high quality run remains above the 60 FPS target.
 
-Overall, the high quality configuration introduces more variation, which is expected because the rendering workload is higher. However, even the lowest individual minimum FPS remains above the 60 FPS target, so all tested configurations satisfy the defined real-time requirement.
+Overall, all tested quality configurations satisfy the defined real-time requirement. The high quality configuration is more demanding, but it still remains suitable for interactive use on the tested desktop system.
 
 \begin{table}[H]
     \centering

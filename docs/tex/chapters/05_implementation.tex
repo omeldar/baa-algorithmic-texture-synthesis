@@ -46,7 +46,7 @@ WebGPU was selected for procedural generation because it allows shader code (wri
 
 The system is divided into two cooperating modules that share a common set of texture definitions and a common seeding mechanism:
 
-\begin{itemize}
+\begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Texture Synthesis Lab}: selects a method, edits its parameters, previews the result, and records generation metrics.
     \item \textbf{Terrain Explorer}: applies generated textures to a procedural 3D world and records runtime performance.
 \end{itemize}
@@ -62,7 +62,6 @@ A central \texttt{texture-types} module defines every method, its category, and 
 
 Further C4-level architecture diagrams are provided in Appendix~\ref{appendix:c4-architecture-diagrams}. They document the main internal containers and implementation-related components that support the high-level architecture shown in Figure~\ref{fig:c2}.
 
-\clearpage
 \subsection{Texture Generation Data Flow}
 
 When the user selects a texture method, the application loads the corresponding method definition from the shared texture-definition module. This definition contains the parameter identifiers, default values, value ranges, the classification category, and the rendering backend. From this definition the user interface automatically generates the matching control elements, so no method-specific UI code is required.
@@ -123,7 +122,6 @@ interface TextureParameter {
 }
 \end{lstlisting}
 
-\clearpage
 \section{Procedural Environment Foundation}
 
 Before describing the procedural environment, it is important to clarify its role in this thesis. The terrain and scene composition are not the main research focus, but serve as a controlled testbed for evaluating texture synthesis methods under real-time conditions. This 3D environment provides a practical context in which generated textures can be applied, measured, and compared with respect to frame rate, scalability, and caching behaviour.
@@ -212,7 +210,7 @@ The prototype implements seven methods across four categories. The table below g
 
 The three procedural methods are implemented as WGSL fragment shaders that run on the GPU. They generate textures purely from mathematical functions and a seed, with no input image.
 
-\begin{itemize}
+\begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Perlin Noise}: the classic gradient noise, exposed through scale, octaves, persistence, and lacunarity parameters. It forms the conceptual foundation for the other procedural methods.
     \item \textbf{Simplex Noise}: an improved gradient noise with fewer directional artifacts, offering contrast, brightness, and domain-warp controls.
     \item \textbf{Wood}: the most complex procedural shader, combining several techniques to imitate real wood grain: anisotropic coordinate compression, domain warping, multi-octave fBm, ridged noise for grooves, and Worley-based surface cracks. It exposes sixteen parameters, including two configurable end colors.
@@ -263,11 +261,12 @@ The rule-based category is represented by Worley Cracks. Instead of blending gra
 
 This method illustrates a different design philosophy: where procedural noise produces continuous organic fields, rule-based generation reasons about discrete structural elements and the rules that govern their appearance.
 
+\clearpage
 \subsection{Texture Approximation and Optimization Concepts}
 
 The example-based and optimization methods address a different question: \textit{how closely can a generated texture match a given target image?}
 
-\begin{itemize}
+\begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{Efros-Leung} synthesizes a texture pixel by pixel, choosing each new pixel by searching the source image for neighborhoods that resemble the already-synthesized surroundings. It is faithful but computationally expensive.
     \item \textbf{Image-Quilting} works with patches rather than single pixels. It copies overlapping blocks from the source and stitches them along a minimum-error boundary cut, which is considerably faster while preserving larger structures.
     \item \textbf{Optimization-Based} synthesis takes a fundamentally different route: instead of copying from the image, it searches for the procedural parameters (currently of the Wood shader) that best reproduce the target. This is implemented as a genetic algorithm.
@@ -303,7 +302,6 @@ The genetic algorithm maintains a population of candidate parameter sets and evo
     \end{tabularx}
 \end{table}
 
-\clearpage
 \section{Performance and Scalability Considerations}
 
 \subsection{Runtime Challenges}
@@ -314,7 +312,7 @@ The central runtime challenge is that the methods have radically different cost 
 
 Several strategies keep the application responsive:
 
-\begin{itemize}
+\begin{itemize}[noitemsep, topsep=0pt]
     \item \textbf{GPU offloading}: all procedural and rule-based generation runs in parallel on the GPU.
     \item \textbf{Web Workers}: slow CPU methods run on background threads so the UI never freezes.
     \item \textbf{Chunked terrain}: only nearby world chunks are kept active, bounding memory and draw calls.
@@ -358,7 +356,6 @@ Variation is still preserved through a configurable texture-reuse rate. At a rat
     \end{tabularx}
 \end{table}
 
-\clearpage
 \section{Experimental and Evaluation Infrastructure}
 
 A core contribution of the prototype is that evaluation is built into the application itself, so that measurements are gathered under the exact conditions being studied.
@@ -368,7 +365,7 @@ A core contribution of the prototype is that evaluation is built into the applic
 
 The prototype measures performance in both modules:
 
-\begin{itemize}
+\begin{itemize}[noitemsep, topsep=0pt]
     \item In the \textbf{Texture Synthesis Lab}, each generation is timed and recorded, and the panel reports the last, average, minimum, and maximum generation time. Example-based methods additionally display their total synthesis time and a real-time-feasibility indicator.
     \item In the \textbf{Terrain Explorer}, a recording session (60 seconds by default) continuously samples frames per second, render time, texture generation time, and chunk generation time, while live graphs visualize the data.
 \end{itemize}
@@ -380,7 +377,6 @@ The prototype measures performance in both modules:
     \label{fig:live-graphs}
 \end{figure}
 
-\clearpage
 \subsection{Evaluation Metrics and Comparison Criteria}
 
 The metrics collected map directly onto the research questions, which compare methods by visual quality, runtime performance, reproducibility, and controllability:
@@ -427,7 +423,7 @@ A batch executes the same frozen configuration several times in a row (one, five
 
 Long unattended runs introduced one reliability problem. The first version kept the per-frame samples of every run in memory until the whole queue had finished, which made the data grow without bound and eventually crashed the browser tab before any result could be saved. The solution is \textit{checkpointing}, which works as follows:
 
-\begin{enumerate}
+\begin{enumerate}[noitemsep, topsep=0pt]
     \item when a configuration finishes, its complete results are exported immediately as one self-contained archive,
     \item afterwards the heavy per-frame samples of that configuration are released, and only a small numeric summary stays in memory,
     \item at the end, all summaries are combined into one comparison index that shows the averaged metrics of every configuration next to each other.
